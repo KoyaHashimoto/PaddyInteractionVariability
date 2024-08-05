@@ -1,46 +1,33 @@
----
-title: "Data processing"
-author: "Koya Hashimoto"
-date: "2021/01/20"
-output: md_document
----
-  
-
+# Data processing
 
 ### ver 4.1 Last modified: 2024/1/23 minor revision (corrected ZooplaCr scaling)
+
 ### ver 4. modified: 2023/8/24 major revision (tentative)
 
 ## Data compile
 
-- Cont: Control
-- Fipro: Fipronil (insecticide) only
-- Pent: Pentoxazone (herbicide) only
-- Joint: Fipronil+Pentoxazone
-- Exclude -1 and 1 weeks 
+-   Cont: Control
+-   Fipro: Fipronil (insecticide) only
+-   Pent: Pentoxazone (herbicide) only
+-   Joint: Fipronil+Pentoxazone
+-   Exclude -1 and 1 weeks
 
-
-```r
+``` r
 library(dplyr)
 ```
 
-```
-## 
-## Attaching package: 'dplyr'
-```
+    ## 
+    ## Attaching package: 'dplyr'
 
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
 
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
 
-```r
+``` r
 library(tidyr)
 library(RColorBrewer)
 library(ggplot2)
@@ -48,8 +35,7 @@ library(ggsci)
 library(patchwork)
 ```
 
-
-```r
+``` r
 PlanktonData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/PlaData171819_corrected.csv", header=TRUE)
 MacrophyteData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/MacrophyteData171819.csv", header=TRUE)
 AnimalData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/animaldata171819.completegathered.fixed.csv", header=TRUE)
@@ -88,11 +74,10 @@ Phytopla <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Roti <- 
   PlanktonData %>%
   filter((Group=="Rotifer") & Species_each_file!="Nauplius_(E._japonicus)") %>%  #omit a different sampling protocol
@@ -101,11 +86,10 @@ Roti <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 #Miki Hirao counted all individuals in 1L sample, whereas Ji Cai took 1/10 subsample from 500mL sample and counted individuals in the 1/10 subsample
 ZooplaCr <- 
   PlanktonData %>%
@@ -115,11 +99,10 @@ ZooplaCr <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Mp <- 
   MacrophyteData %>%
   group_by(Year, Tank, Week, SubPlot, Year_Tank) %>%
@@ -129,12 +112,11 @@ Mp <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week', 'SubPlot' (override with `.groups` argument)`summarise()` regrouping output by 'Year',
-## 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week', 'SubPlot' (override
+    ## with `.groups` argument)`summarise()` regrouping output by 'Year', 'Tank',
+    ## 'Week' (override with `.groups` argument)
 
-```r
+``` r
 Det <- 
   AnimalData %>%
   filter(Function=="Detritivore") %>%
@@ -143,11 +125,10 @@ Det <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Herb <- 
   AnimalData %>%
   filter(Function=="Herbivore") %>%
@@ -156,11 +137,10 @@ Herb <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Pred <- 
   AnimalData %>%
   filter(Function=="Predator") %>%
@@ -169,11 +149,10 @@ Pred <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Pred.P <- 
   AnimalData %>%
   filter(Function=="Predator" & Habitat=="Phytophilous") %>%
@@ -182,11 +161,10 @@ Pred.P <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Pred.B <-   AnimalData %>%
   filter(Function=="Predator" & Habitat=="Benthic") %>%
   group_by(Year, Tank, Week, Year_Tank) %>%
@@ -194,11 +172,10 @@ Pred.B <-   AnimalData %>%
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Pred.S <-   AnimalData %>%
   filter(Function=="Predator" & Habitat=="Neustonic") %>%
   group_by(Year, Tank, Week, Year_Tank) %>%
@@ -206,11 +183,10 @@ Pred.S <-   AnimalData %>%
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Pred.C <-   AnimalData %>%
   filter(Function=="Predator" & Habitat=="Nektonic") %>%
   group_by(Year, Tank, Week, Year_Tank) %>%
@@ -218,11 +194,10 @@ Pred.C <-   AnimalData %>%
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Mollusca <- 
   AnimalData %>%
   filter(Species=="Bivalvia_sp" | Species=="Physa_acuta") %>%
@@ -231,11 +206,10 @@ Mollusca <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-```
-## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups` argument)
-```
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
+    ## `.groups` argument)
 
-```r
+``` r
 Commulist <- list(Phytopla, Roti, ZooplaCr, Mp, Det, Herb, Pred.P, Pred.B, Pred.S, Pred.C, Mollusca)
 names(Commulist) <- c("Phytopla", "Roti", "ZooplaCr", "Mp", "Det", "Herb", "Pred.P", "Pred.B", "Pred.S", "Pred.C", "Mollusca")
 
@@ -251,27 +225,21 @@ lapply(1:3, function(i) {
 )
 ```
 
-```
-## [[1]]
-```
+    ## [[1]]
 
-![plot of chunk data](figure/data-1.png)
+![](Data_processing_files/figure-markdown_github/data-1.png)
 
-```
-## 
-## [[2]]
-```
+    ## 
+    ## [[2]]
 
-![plot of chunk data](figure/data-2.png)
+![](Data_processing_files/figure-markdown_github/data-2.png)
 
-```
-## 
-## [[3]]
-```
+    ## 
+    ## [[3]]
 
-![plot of chunk data](figure/data-3.png)
+![](Data_processing_files/figure-markdown_github/data-3.png)
 
-```r
+``` r
 lapply(4:11, function(i) {
   Commulist[[i]] %>%
     separate(Tank, into=c("Treatment", "Num"), sep=-1) %>% 
@@ -281,62 +249,46 @@ lapply(4:11, function(i) {
 )
 ```
 
-```
-## [[1]]
-```
+    ## [[1]]
 
-![plot of chunk data](figure/data-4.png)
+![](Data_processing_files/figure-markdown_github/data-4.png)
 
-```
-## 
-## [[2]]
-```
+    ## 
+    ## [[2]]
 
-![plot of chunk data](figure/data-5.png)
+![](Data_processing_files/figure-markdown_github/data-5.png)
 
-```
-## 
-## [[3]]
-```
+    ## 
+    ## [[3]]
 
-![plot of chunk data](figure/data-6.png)
+![](Data_processing_files/figure-markdown_github/data-6.png)
 
-```
-## 
-## [[4]]
-```
+    ## 
+    ## [[4]]
 
-![plot of chunk data](figure/data-7.png)
+![](Data_processing_files/figure-markdown_github/data-7.png)
 
-```
-## 
-## [[5]]
-```
+    ## 
+    ## [[5]]
 
-![plot of chunk data](figure/data-8.png)
+![](Data_processing_files/figure-markdown_github/data-8.png)
 
-```
-## 
-## [[6]]
-```
+    ## 
+    ## [[6]]
 
-![plot of chunk data](figure/data-9.png)
+![](Data_processing_files/figure-markdown_github/data-9.png)
 
-```
-## 
-## [[7]]
-```
+    ## 
+    ## [[7]]
 
-![plot of chunk data](figure/data-10.png)
+![](Data_processing_files/figure-markdown_github/data-10.png)
 
-```
-## 
-## [[8]]
-```
+    ## 
+    ## [[8]]
 
-![plot of chunk data](figure/data-11.png)
+![](Data_processing_files/figure-markdown_github/data-11.png)
 
-```r
+``` r
 # Log-transformation and standardization
 
 Tslist <- lapply(1:11, function(i) {
@@ -364,153 +316,151 @@ lapply(c("Phytopla1", "Roti1", "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1",
 )
 ```
 
-```
-## [[1]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1       799      0.706 
-##  2     4 2017_Cont1        86     -0.118 
-##  3     6 2017_Cont1      1873      1.02  
-##  4     8 2017_Cont1       187      0.168 
-##  5    10 2017_Cont1       127      0.0258
-##  6    12 2017_Cont1       305      0.349 
-##  7    14 2017_Cont1      1001      0.790 
-##  8    16 2017_Cont1      3170      1.22  
-##  9    18 2017_Cont1       613      0.608 
-## 10    20 2017_Cont1      3860      1.29  
-## # ... with 254 more rows
-## 
-## [[2]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1         0      -1.19 
-##  2     4 2017_Cont1        29       0.870
-##  3     6 2017_Cont1        27       0.828
-##  4     8 2017_Cont1       124       1.74 
-##  5    10 2017_Cont1       129       1.76 
-##  6    12 2017_Cont1        92       1.56 
-##  7    14 2017_Cont1        75       1.43 
-##  8    16 2017_Cont1        40       1.06 
-##  9    18 2017_Cont1        29       0.870
-## 10    20 2017_Cont1        40       1.06 
-## # ... with 254 more rows
-## 
-## [[3]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1        60       1.27 
-##  2     4 2017_Cont1        17       0.366
-##  3     6 2017_Cont1        25       0.638
-##  4     8 2017_Cont1         3      -0.745
-##  5    10 2017_Cont1         5      -0.446
-##  6    12 2017_Cont1         8      -0.146
-##  7    14 2017_Cont1        24       0.609
-##  8    16 2017_Cont1        36       0.898
-##  9    18 2017_Cont1        13       0.180
-## 10    20 2017_Cont1        13       0.180
-## # ... with 254 more rows
-## 
-## [[4]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1         2     0.493  
-##  2     4 2017_Cont1         0    -0.857  
-##  3     6 2017_Cont1         3     0.847  
-##  4     8 2017_Cont1         1    -0.00524
-##  5    10 2017_Cont1         3     0.847  
-##  6    12 2017_Cont1         1    -0.00524
-##  7    14 2017_Cont1         2     0.493  
-##  8    16 2017_Cont1         0    -0.857  
-##  9    18 2017_Cont1         0    -0.857  
-## 10    20 2017_Cont1         0    -0.857  
-## # ... with 254 more rows
-## 
-## [[5]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1         0      -0.593
-##  2     4 2017_Cont1         0      -0.593
-##  3     6 2017_Cont1         5       1.81 
-##  4     8 2017_Cont1         2       0.882
-##  5    10 2017_Cont1        13       2.95 
-##  6    12 2017_Cont1        11       2.74 
-##  7    14 2017_Cont1         8       2.36 
-##  8    16 2017_Cont1        14       3.04 
-##  9    18 2017_Cont1         9       2.50 
-## 10    20 2017_Cont1        12       2.85 
-## # ... with 254 more rows
-## 
-## [[6]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1         2       0.198
-##  2     4 2017_Cont1         1      -0.170
-##  3     6 2017_Cont1         8       1.19 
-##  4     8 2017_Cont1         1      -0.170
-##  5    10 2017_Cont1         4       0.661
-##  6    12 2017_Cont1         9       1.29 
-##  7    14 2017_Cont1         6       0.966
-##  8    16 2017_Cont1         7       1.09 
-##  9    18 2017_Cont1         3       0.459
-## 10    20 2017_Cont1         2       0.198
-## # ... with 254 more rows
-## 
-## [[7]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1         0      -1.04 
-##  2     4 2017_Cont1         3       0.547
-##  3     6 2017_Cont1         0      -1.04 
-##  4     8 2017_Cont1         0      -1.04 
-##  5    10 2017_Cont1         2       0.218
-##  6    12 2017_Cont1         0      -1.04 
-##  7    14 2017_Cont1         3       0.547
-##  8    16 2017_Cont1         4       0.803
-##  9    18 2017_Cont1         0      -1.04 
-## 10    20 2017_Cont1         0      -1.04 
-## # ... with 254 more rows
-## 
-## [[8]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1         0      -0.263
-##  2     4 2017_Cont1         0      -0.263
-##  3     6 2017_Cont1         0      -0.263
-##  4     8 2017_Cont1         0      -0.263
-##  5    10 2017_Cont1         0      -0.263
-##  6    12 2017_Cont1         0      -0.263
-##  7    14 2017_Cont1         0      -0.263
-##  8    16 2017_Cont1         0      -0.263
-##  9    18 2017_Cont1         0      -0.263
-## 10    20 2017_Cont1         0      -0.263
-## # ... with 254 more rows
-## 
-## [[9]]
-## # A tibble: 264 x 4
-##     Week Year_Tank  Abundance scAbundance
-##    <dbl> <fct>          <dbl>       <dbl>
-##  1     2 2017_Cont1         0      -1.21 
-##  2     4 2017_Cont1         0      -1.21 
-##  3     6 2017_Cont1        33       0.766
-##  4     8 2017_Cont1         0      -1.21 
-##  5    10 2017_Cont1        31       0.732
-##  6    12 2017_Cont1        22       0.546
-##  7    14 2017_Cont1        15       0.342
-##  8    16 2017_Cont1         0      -1.21 
-##  9    18 2017_Cont1         0      -1.21 
-## 10    20 2017_Cont1         4      -0.311
-## # ... with 254 more rows
-```
+    ## [[1]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1       799      0.706 
+    ##  2     4 2017_Cont1        86     -0.118 
+    ##  3     6 2017_Cont1      1873      1.02  
+    ##  4     8 2017_Cont1       187      0.168 
+    ##  5    10 2017_Cont1       127      0.0258
+    ##  6    12 2017_Cont1       305      0.349 
+    ##  7    14 2017_Cont1      1001      0.790 
+    ##  8    16 2017_Cont1      3170      1.22  
+    ##  9    18 2017_Cont1       613      0.608 
+    ## 10    20 2017_Cont1      3860      1.29  
+    ## # ... with 254 more rows
+    ## 
+    ## [[2]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1         0      -1.19 
+    ##  2     4 2017_Cont1        29       0.870
+    ##  3     6 2017_Cont1        27       0.828
+    ##  4     8 2017_Cont1       124       1.74 
+    ##  5    10 2017_Cont1       129       1.76 
+    ##  6    12 2017_Cont1        92       1.56 
+    ##  7    14 2017_Cont1        75       1.43 
+    ##  8    16 2017_Cont1        40       1.06 
+    ##  9    18 2017_Cont1        29       0.870
+    ## 10    20 2017_Cont1        40       1.06 
+    ## # ... with 254 more rows
+    ## 
+    ## [[3]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1        60       1.27 
+    ##  2     4 2017_Cont1        17       0.366
+    ##  3     6 2017_Cont1        25       0.638
+    ##  4     8 2017_Cont1         3      -0.745
+    ##  5    10 2017_Cont1         5      -0.446
+    ##  6    12 2017_Cont1         8      -0.146
+    ##  7    14 2017_Cont1        24       0.609
+    ##  8    16 2017_Cont1        36       0.898
+    ##  9    18 2017_Cont1        13       0.180
+    ## 10    20 2017_Cont1        13       0.180
+    ## # ... with 254 more rows
+    ## 
+    ## [[4]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1         2     0.493  
+    ##  2     4 2017_Cont1         0    -0.857  
+    ##  3     6 2017_Cont1         3     0.847  
+    ##  4     8 2017_Cont1         1    -0.00524
+    ##  5    10 2017_Cont1         3     0.847  
+    ##  6    12 2017_Cont1         1    -0.00524
+    ##  7    14 2017_Cont1         2     0.493  
+    ##  8    16 2017_Cont1         0    -0.857  
+    ##  9    18 2017_Cont1         0    -0.857  
+    ## 10    20 2017_Cont1         0    -0.857  
+    ## # ... with 254 more rows
+    ## 
+    ## [[5]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1         0      -0.593
+    ##  2     4 2017_Cont1         0      -0.593
+    ##  3     6 2017_Cont1         5       1.81 
+    ##  4     8 2017_Cont1         2       0.882
+    ##  5    10 2017_Cont1        13       2.95 
+    ##  6    12 2017_Cont1        11       2.74 
+    ##  7    14 2017_Cont1         8       2.36 
+    ##  8    16 2017_Cont1        14       3.04 
+    ##  9    18 2017_Cont1         9       2.50 
+    ## 10    20 2017_Cont1        12       2.85 
+    ## # ... with 254 more rows
+    ## 
+    ## [[6]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1         2       0.198
+    ##  2     4 2017_Cont1         1      -0.170
+    ##  3     6 2017_Cont1         8       1.19 
+    ##  4     8 2017_Cont1         1      -0.170
+    ##  5    10 2017_Cont1         4       0.661
+    ##  6    12 2017_Cont1         9       1.29 
+    ##  7    14 2017_Cont1         6       0.966
+    ##  8    16 2017_Cont1         7       1.09 
+    ##  9    18 2017_Cont1         3       0.459
+    ## 10    20 2017_Cont1         2       0.198
+    ## # ... with 254 more rows
+    ## 
+    ## [[7]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1         0      -1.04 
+    ##  2     4 2017_Cont1         3       0.547
+    ##  3     6 2017_Cont1         0      -1.04 
+    ##  4     8 2017_Cont1         0      -1.04 
+    ##  5    10 2017_Cont1         2       0.218
+    ##  6    12 2017_Cont1         0      -1.04 
+    ##  7    14 2017_Cont1         3       0.547
+    ##  8    16 2017_Cont1         4       0.803
+    ##  9    18 2017_Cont1         0      -1.04 
+    ## 10    20 2017_Cont1         0      -1.04 
+    ## # ... with 254 more rows
+    ## 
+    ## [[8]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1         0      -0.263
+    ##  2     4 2017_Cont1         0      -0.263
+    ##  3     6 2017_Cont1         0      -0.263
+    ##  4     8 2017_Cont1         0      -0.263
+    ##  5    10 2017_Cont1         0      -0.263
+    ##  6    12 2017_Cont1         0      -0.263
+    ##  7    14 2017_Cont1         0      -0.263
+    ##  8    16 2017_Cont1         0      -0.263
+    ##  9    18 2017_Cont1         0      -0.263
+    ## 10    20 2017_Cont1         0      -0.263
+    ## # ... with 254 more rows
+    ## 
+    ## [[9]]
+    ## # A tibble: 264 x 4
+    ##     Week Year_Tank  Abundance scAbundance
+    ##    <dbl> <fct>          <dbl>       <dbl>
+    ##  1     2 2017_Cont1         0      -1.21 
+    ##  2     4 2017_Cont1         0      -1.21 
+    ##  3     6 2017_Cont1        33       0.766
+    ##  4     8 2017_Cont1         0      -1.21 
+    ##  5    10 2017_Cont1        31       0.732
+    ##  6    12 2017_Cont1        22       0.546
+    ##  7    14 2017_Cont1        15       0.342
+    ##  8    16 2017_Cont1         0      -1.21 
+    ##  9    18 2017_Cont1         0      -1.21 
+    ## 10    20 2017_Cont1         4      -0.311
+    ## # ... with 254 more rows
 
-```r
+``` r
 Tslist[["Mp1"]] <- mutate(Tslist[["Mp1"]], scAbundance=as.numeric(scale(Abundance)))
 
 par(mfrow=c(1, 2))
@@ -526,9 +476,9 @@ Tslist[["Zoopla1"]] %>%
   boxplot(scAbundance ~ Year, .)
 ```
 
-![plot of chunk data](figure/data-12.png)
+![](Data_processing_files/figure-markdown_github/data-12.png)
 
-```r
+``` r
 all_Ts <- 
   lapply(1:11, function(i) {
     mutate(Tslist[[i]], Recipient=names(Tslist)[i])
@@ -540,8 +490,7 @@ all_Ts <-
 
 ### Processing for plotting
 
-
-```r
+``` r
 #Abundance.gathered <- read.csv("./processed_data/all_Ts240123.csv", header=TRUE)
 
 Abundance.gathered <- all_Ts
@@ -625,18 +574,15 @@ g_Aball <- ggplot(Abundance.gathered_mod, aes(x=Time2, y=scAbundance)) +
 
 ### Fig. S3a
 
-
-```r
+``` r
 #windows(12, 7.5, rescale="fixed")
 g_Aball
 ```
 
-```
-## Warning: Removed 30 row(s) containing missing values (geom_path).
-```
+    ## Warning: Removed 30 row(s) containing missing values (geom_path).
 
-![plot of chunk fig](figure/fig-1.png)
+![](Data_processing_files/figure-markdown_github/fig-1.png)
 
-```r
+``` r
 #ggsave("fig.s3.pdf", fig.s3, device=cairo_pdf, width=12, height=15, unit="in")
 ```
