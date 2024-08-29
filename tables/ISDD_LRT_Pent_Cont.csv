@@ -1,0 +1,7 @@
+"","Df","Chisq","Chi Df","Pr(>Chisq)"
+"scale(log_abs_DD, scale = FALSE)",10,0.68,1,0.41
+"SignDD",10,0.07,1,0.8
+"scale(smap_coef_SD, scale = FALSE)",10,7.62,1,0.01
+"scale(smap_coef_mean, scale = FALSE)",10,0.25,1,0.62
+"Function",9,1.23,2,0.54
+"scale(log_abs_DD, scale = FALSE):SignDD",10,1.06,1,0.3
