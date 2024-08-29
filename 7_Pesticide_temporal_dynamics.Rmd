@@ -14,10 +14,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load data
 
 ```{r data}
-PW171819 <- read.csv("../EDM2017-2019_analysis/Data2017-2019/PW171819.csv", header=TRUE)
-FW171819 <- read.csv("../EDM2017-2019_analysis/Data2017-2019/FW171819.csv", header=TRUE)
-PS171819 <- read.csv("../EDM2017-2019_analysis/Data2017-2019/PS171819.csv", header=TRUE)
-FS171819 <- read.csv("../EDM2017-2019_analysis/Data2017-2019/FS171819.csv", header=TRUE)
+PW171819 <- read.csv("./raw_data/PW171819.csv", header=TRUE)
+FW171819 <- read.csv("./raw_data/FW171819.csv", header=TRUE)
+PS171819 <- read.csv("./raw_data/PS171819.csv", header=TRUE)
+FS171819 <- read.csv("./raw_data/FS171819.csv", header=TRUE)
 ```
 
 ## Display pesticide temporal dynamics (Fig. S1)

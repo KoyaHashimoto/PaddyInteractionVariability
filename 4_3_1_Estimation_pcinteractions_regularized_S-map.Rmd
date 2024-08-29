@@ -5,6 +5,8 @@ date: "2024/7/30"
 output: html_document
 ---
 
+# Estimation of per capita interaction effects by regularized S-map
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -143,8 +145,8 @@ regulSmap0 <- function(block, tp, target_column, lib, columns) {
   set.seed(ran_seed)
   
   # Load defined functions
-  source("./functions/Extended_SSR_v1.R")
-  source("./functions/Extended_Smap_v1.R")
+  source("./src/Extended_SSR_v1.R")
+  source("./src/Extended_Smap_v1.R")
   
   # Set parameter ranges
   theta_test <- c(0, 0.1, 0.5, 1, 1.5, 2, 2.5, 3, 4, 6, 8)
@@ -201,8 +203,8 @@ regulSmap1 <- function(block, tp, target_column, lib, columns, theta, lambda, re
   set.seed(ran_seed)
   
   # Load defined functions
-  source("./functions/Extended_SSR_v1.R")
-  source("./functions/Extended_Smap_v1.R")
+  source("./src/Extended_SSR_v1.R")
+  source("./src/Extended_Smap_v1.R")
   
   #track IS
   mlt_smap_res.1 <- extended_lnlp(block=block, lib=lib, tp=tp, target_column=target_column, lib_column=columns, 
@@ -526,8 +528,8 @@ all_regulsmap_coefs <-
 head(all_regulsmap_model_outputs)
 head(all_regulsmap_coefs)
 
-#write.csv(all_regulsmap_model_outputs, "./processed_data/all_regulsmap_model_outputs240123.csv", row.names=FALSE)
-#write.csv(all_regulsmap_coefs, "./processed_data/all_regulsmap_coefs240123.csv", row.names=FALSE)
+write.csv(all_regulsmap_model_outputs, "./processed_data/all_regulsmap_model_outputs240123.csv", row.names=FALSE)
+write.csv(all_regulsmap_coefs, "./processed_data/all_regulsmap_coefs240123.csv", row.names=FALSE)
 ```
 
 ## Data visualization

@@ -178,7 +178,7 @@ for (i in Trt_Cont) {
   ISDD_LRT_res <- as.data.frame(anova(LRT_res))
   ISDD_LRT_res[,2] <- round(ISDD_LRT_res[,2], digits=2)
   ISDD_LRT_res[,4] <- round(ISDD_LRT_res[,4], digits=2)
-  write.csv(ISDD_LRT_res, paste("./output/table/ISDD_LRT_", i, ".csv", sep=""))
+  write.csv(ISDD_LRT_res, paste("./tables/ISDD_LRT_", i, ".csv", sep=""))
 }
 names(LRT_res_list) <- Trt_Cont
 LRT_res_list

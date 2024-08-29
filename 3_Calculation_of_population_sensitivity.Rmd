@@ -119,7 +119,7 @@ reaction.norm <-
 
 reaction.norm #Fig. 2b
 
-#write.csv(Abundance_TrEff, "./processed_data/Abundance_TrEff.csv", row.names=FALSE) # export sensitivity data
+write.csv(Abundance_TrEff, "./processed_data/Abundance_TrEff.csv", row.names=FALSE) # export sensitivity data
 ```
 
 ## Generate Fig. 2

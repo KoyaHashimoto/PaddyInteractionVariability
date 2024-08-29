@@ -27,7 +27,7 @@ library(ggplot2)
 ### Data compile
 
 ```{r data, include=TRUE}
-all_Ts <- read.csv("./processed_data/all_Ts240123.csv") 
+all_Ts <- read.csv("../processed_data/all_Ts240123.csv") 
 
 all_Ts <- 
   all_Ts %>%
@@ -260,7 +260,7 @@ Optlagmat <-
   head(n=10)
 rownames(Optlagmat) <- Optlagmat$Cause
 t(Optlagmat[,-1])
-write.csv(Optlagmat, "./CCM/ccm_tables/Optlagmat.csv", row.names=FALSE)
+write.csv(Optlagmat, "../4_2_CCM/ccm_tables/Optlagmat.csv", row.names=FALSE)
 ```
 
 ```{r figs, fig.width=8, fig.height=6}

@@ -24,7 +24,7 @@ library(patchwork); packageVersion("patchwork")
 ### Load data
 
 ```{r data}
-all_multsmap_model_outputs <- read.csv("./processed_data/all_regulsmap_model_outputs.csv")
+all_multsmap_model_outputs <- read.csv("./processed_data/all_regulsmap_model_outputs240123.csv")
 
 head(all_multsmap_model_outputs)
 

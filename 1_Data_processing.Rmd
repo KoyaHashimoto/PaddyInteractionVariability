@@ -48,9 +48,9 @@ library(patchwork); packageVersion("patchwork")
 - Exclude -1 and 1 weeks 
 
 ```{r  data, fig.width=10, fig.height=4}
-PlanktonData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/PlaData171819_corrected.csv", header=TRUE)
-MacrophyteData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/MacrophyteData171819.csv", header=TRUE)
-AnimalData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/animaldata171819.completegathered.fixed.csv", header=TRUE)
+PlanktonData <- read.csv("./raw_data/PlaData171819_corrected.csv", header=TRUE)
+MacrophyteData <- read.csv("./raw_data/MacrophyteData171819.csv", header=TRUE)
+AnimalData <- read.csv("./raw_data/animaldata171819.completegathered.fixed.csv", header=TRUE)
 
 # Data compilation
 
@@ -220,7 +220,7 @@ all_Ts <-
   lapply(1:11, function(i) {
     mutate(Tslist[[i]], Recipient=names(Tslist)[i])
   }) %>% do.call(rbind, .)
-#write.csv(all_Ts, "./processed_data/all_Ts240123.csv", row.names=FALSE) # Save processed time series data
+write.csv(all_Ts, "./processed_data/all_Ts240123.csv", row.names=FALSE) # Save processed time series data
 ```
 
 ## Data visualization
