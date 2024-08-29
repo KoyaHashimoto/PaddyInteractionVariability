@@ -1,0 +1,78 @@
+---
+title: "Regularized S-map diagnostics"
+author: "Koya Hashimoto"
+date: "2023/8/29"
+output: html_document
+---
+
+# Regularized S-map diagnostics
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load required packages
+
+```{r library}
+sessionInfo()
+library(ggplot2); packageVersion("ggplot2")
+library(dplyr); packageVersion("dplyr")
+library(tidyr); packageVersion("tidyr")
+library(patchwork); packageVersion("patchwork")
+```
+
+### Load data
+
+```{r data}
+all_multsmap_model_outputs <- read.csv("./processed_data/all_regulsmap_model_outputs.csv")
+
+head(all_multsmap_model_outputs)
+
+all_multsmap_model_outputs$target <- 
+  factor(all_multsmap_model_outputs$target, 
+         levels=unique(all_multsmap_model_outputs$target))
+```
+
+## Prediction skills of S-map models
+
+Relationships between predicted vs. observed values. Spearman's correlation coefficients rho is shown.
+
+```{r model prediction skills, fig.width=10, fig.height=8.5, warning=FALSE}
+theme_set(theme_bw())
+
+all_multsmap_model_outputs_list <- all_multsmap_model_outputs %>% split(., f=.$target) 
+
+figs <- lapply(1:9, function(i) {
+  ggplot(all_multsmap_model_outputs_list[[i]], aes(x=pred, y=obs)) + 
+    geom_point() + geom_abline(slope=1, intercept=0) + 
+    labs(title=levels(all_multsmap_model_outputs$target)[i], 
+         subtitle=paste("rho=", 
+                        round(cor(na.omit(all_multsmap_model_outputs_list[[i]])$obs, 
+                                  na.omit(all_multsmap_model_outputs_list[[i]])$pred, method="spearman"), digits=2), sep=""))
+})
+
+predobsfigs <- figs[[1]]
+for (i in 2:9) {
+  predobsfigs <- predobsfigs + figs[[i]]
+}
+predobsfigs
+```
+
+## Temporal patterns of prediction vs. observation values 
+
+Temporal patterns of predicted (red) and observed (black) values.
+When prediction is dominated by temporal autocorrelation, shapes of red lines are sometimes like just a "horizontal shift" from black lines.
+
+```{r model prediction skills timeseries, fig.width=10, fig.height=2.5, warning=FALSE}
+figs <- lapply(1:9, function(i) {
+  all_multsmap_model_outputs_list[[i]] %>% 
+    mutate(timestep=1:nrow(all_multsmap_model_outputs_list[[i]])) %>%
+    ggplot(aes(x=timestep, y=obs)) + geom_line() + 
+    geom_line(aes(x=timestep, y=pred, color="red")) + 
+    labs(title=levels(all_multsmap_model_outputs$target)[i])
+})
+
+for (i in 1:9) {
+  print(figs[[i]])
+}
+```

@@ -1,0 +1,493 @@
+---
+title: "Treatment effects on population density tested by LMMs"
+author: "Koya Hashimoto"
+date: "2024/08/20"
+output: html_document
+---
+
+```{r md-header, include=FALSE}
+# ---
+# title: "Treatment effects on population density tested by LMMs"
+# author: "Koya Hashimoto"
+# date: "2024/08/20"
+# output: 
+#   md_document: 
+#     variant: markdown_github
+# ---
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Treatment effects on population density testetd by LMMs
+
+### Load required packages
+
+```{r packages}
+sessionInfo() #save session information
+
+library(dplyr); packageVersion("dplyr") #v.1.0.2
+library(tidyr); packageVersion("tidyr") #v.1.1.2
+library(RColorBrewer); packageVersion("RColorBrewer") #v.1.1.2
+library(lme4); packageVersion("lme4") #v.1.1.25
+library(glmmTMB); packageVersion("glmmTMB") #v.1.0.2.1
+library(car); packageVersion("car") #v.3.0.10
+library(DHARMa); packageVersion("DHARMa") #v.0.3.3.0
+library(emmeans); packageVersion("emmeans") #v.1.5.2.1
+library(ggeffects); packageVersion("ggeffects") #v.1.2.1
+library(ggplot2); packageVersion("ggplot2") #v.3.3.2
+library(ggsci); packageVersion("ggsci") #v.2.9
+library(patchwork); packageVersion("patchwork") #v.1.1.1
+```
+
+### Data compilation 
+
+```{r data 1}
+all_Ts <- read.csv("./processed_data/all_Ts240123.csv") 
+
+all_Ts <- 
+  all_Ts %>%
+  separate(Year_Tank, into=c("Year", "Tank"), sep="_") %>% #year and tank
+  mutate(Treatment=substr(Tank, 1, nchar(Tank)-1)) %>% #treatment names
+  mutate(Treatment=factor(Treatment, levels=c("Cont", "Fipro", "Pent", "Joint")), #order of treatment names
+         Tank=factor(Tank, levels=unique(Tank)), #order of tank names
+         Recipient=factor(Recipient, levels=c("Phytopla1", "Roti1", "Zoopla1", "Mp1", 
+                                              "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Moll1"))) 
+
+head(all_Ts)
+```
+
+## LMM analysis
+
+Assuming the following four random-part parameters
+
+- ρ（one time step correlation）
+- σ（residual SD）
+- σT（among Tank SD）
+- σY（among Year SD）
+
+Type III LRT
+
+- https://cran.r-project.org/web/packages/glmmTMB/vignettes/model_evaluation.pdf 
+  - "The mixed package implements a true “type-3-like” parameter-droppin gmechanism for [g]lmer models. Something like that could in principle be applied here."
+
+### Phytopla density
+
+Results summary
+
+- type 3 LRT
+- Treatment: P = 0.60
+- Week: P < 0.01
+- TxP: P = 0.096
+
+```{r phytopla}
+all_Ts_ <- all_Ts
+all_Ts_$Tank_Year <- with(all_Ts_, paste(Tank, Year, sep="_"))
+all_Ts_$Week.fctr <- with(all_Ts_, as.factor(Week))
+all_Ts_$Year.fctr <- with(all_Ts_, as.factor(Year))
+
+##set contrasts options (required for type III LRT)
+options(contrasts = c("contr.sum", "contr.sum"))
+
+##glmmTMB
+Ph.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) + #specify fixed and random effects
+                           ar1(Week.fctr+0|Tank_Year), #specify AR1 correlation structure per Tank per Year
+                         data=subset(na.omit(all_Ts_), Recipient=="Phytopla1"), 
+                         REML=FALSE, #set ML
+                         dispformula=~0) #remove unnecessary sigma
+
+#type 3 LRT
+full.model.mat <- model.matrix(Ph.Ab.glmmTMB) #extract design matrix
+Ph.Ab.glmmTMB.red1 <- update(Ph.Ab.glmmTMB, .~.-Treatment:Week.fctr) #remove Interaction effect
+Ph.Ab.glmmTMB.red2.int <- update(Ph.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year)) #remove Treatment main effect
+Ph.Ab.glmmTMB.red2.int_ <- update(Ph.Ab.glmmTMB.red2.int, #change optimization options
+                                  control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")),
+                                  start=list(theta=c(0.0056, 0.047, 0.86, 0.64)))
+Ph.Ab.glmmTMB.red3.int <- update(Ph.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year)) #remove Week main effect
+anova(Ph.Ab.glmmTMB, Ph.Ab.glmmTMB.red1) #Interaction effect
+anova(Ph.Ab.glmmTMB, Ph.Ab.glmmTMB.red2.int_) #type 3 Treatment effect
+anova(Ph.Ab.glmmTMB, Ph.Ab.glmmTMB.red3.int) #type 3 Week effect
+
+Ph.Ab.glmmTMB.REML <- update(Ph.Ab.glmmTMB, REML=TRUE) #set REML for summarizing model result
+Ph.Ab.glmmTMB.REML_ <- update(Ph.Ab.glmmTMB.REML, control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS"))) #change optimizer
+plot(simulateResiduals(Ph.Ab.glmmTMB.REML_)) #diagnosis
+summary(Ph.Ab.glmmTMB.REML_)
+
+Trt.Ph <- emmeans(Ph.Ab.glmmTMB.REML_, specs="Treatment")
+contrast(Trt.Ph, method="trt.vs.ctrl") #Dunnet test
+
+plot(ggemmeans(Ph.Ab.glmmTMB.REML_, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of phytoplankton")
+```
+
+### Rotifer density
+
+- type 3 LRT
+- Treatment: P = 0.04
+- Week: P < 0.001
+- TxP: P = 0.096
+
+```{r rotifer}
+Ro.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                           ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Roti1"), REML=FALSE, 
+                         dispformula=~0)
+Ro.Ab.glmmTMB.red1 <- update(Ro.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(Ro.Ab.glmmTMB)
+Ro.Ab.glmmTMB.red2.int <- update(Ro.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+Ro.Ab.glmmTMB.red2.int_ <- update(Ro.Ab.glmmTMB.red2.int, 
+                                  control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")), 
+                                  start=list(theta=c(1.68, 0.00000011, 0.89, 0.55)))
+Ro.Ab.glmmTMB.red3.int <- update(Ro.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+Ro.Ab.glmmTMB.red3.int_ <- update(Ro.Ab.glmmTMB.red3.int, 
+                                  control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")))
+anova(Ro.Ab.glmmTMB, Ro.Ab.glmmTMB.red1) #interaction effect
+anova(Ro.Ab.glmmTMB, Ro.Ab.glmmTMB.red2.int_) #type 3 effect
+anova(Ro.Ab.glmmTMB, Ro.Ab.glmmTMB.red3.int_) #type 3 effect
+
+Ro.Ab.glmmTMB.REML <- update(Ro.Ab.glmmTMB, REML=TRUE)
+plot(simulateResiduals(Ro.Ab.glmmTMB.REML))
+summary(Ro.Ab.glmmTMB.REML)
+
+Trt.Ro <- emmeans(Ro.Ab.glmmTMB.REML, specs="Treatment")
+contrast(Trt.Ro, method="trt.vs.ctrl")
+
+plot(ggemmeans(Ro.Ab.glmmTMB.REML, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of rotifers")
+```
+
+### Zoopla density
+
+- type 3 LRT
+- Treatment: P = 0.41
+- Week: P < 0.001
+- TxP: P = 0.32
+
+```{r zoopla}
+Zo.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                           ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Zoopla1"), REML=FALSE, 
+                         dispformula=~0)
+Zo.Ab.glmmTMB.red1 <- update(Zo.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(Zo.Ab.glmmTMB)
+Zo.Ab.glmmTMB.red2.int <- update(Zo.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+Zo.Ab.glmmTMB.red3.int <- update(Zo.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+anova(Zo.Ab.glmmTMB, Zo.Ab.glmmTMB.red1) #interaction effect
+anova(Zo.Ab.glmmTMB, Zo.Ab.glmmTMB.red2.int) #type 3 effect
+anova(Zo.Ab.glmmTMB, Zo.Ab.glmmTMB.red3.int) #type 3 effect
+
+Zo.Ab.glmmTMB.REML <- update(Zo.Ab.glmmTMB, REML=TRUE)
+Zo.Ab.glmmTMB.REML_ <- update(Zo.Ab.glmmTMB.REML, control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")))
+plot(simulateResiduals(Zo.Ab.glmmTMB.REML_))
+summary(Zo.Ab.glmmTMB.REML_)
+
+Trt.Zo <- lsmeans(Zo.Ab.glmmTMB.REML_, specs="Treatment")
+contrast(Trt.Zo, method="trt.vs.ctrl")
+
+plot(ggemmeans(Zo.Ab.glmmTMB.REML_, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of crustacean zooplankton")
+```
+
+### Macrophyte density
+
+- type 3 LRT
+- Treatment: P < 0.01
+- Week: P < 0.001
+- TxP: P = 0.26
+
+```{r macrophyte}
+
+Mp.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                           ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Mp1"), REML=FALSE, 
+                         dispformula=~0)
+Mp.Ab.glmmTMB <- update(Mp.Ab.glmmTMB, control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")), 
+                        start=list(theta=c(0.014, 0.24, 0.607, 0.9)))
+Mp.Ab.glmmTMB.red1 <- update(Mp.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(Mp.Ab.glmmTMB)
+Mp.Ab.glmmTMB.red2.int <- update(Mp.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+Mp.Ab.glmmTMB.red2.int_ <- update(Mp.Ab.glmmTMB.red2.int, start=list(theta=c(0.495, 0.062, 0.692, 0.92)))
+Mp.Ab.glmmTMB.red3.int <- update(Mp.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+Mp.Ab.glmmTMB.red3.int_ <- update(Mp.Ab.glmmTMB.red3.int, start=list(theta=c(0.141, 0.00082, 0.86, 0.89)))
+anova(Mp.Ab.glmmTMB, Mp.Ab.glmmTMB.red1) #interaction effect
+anova(Mp.Ab.glmmTMB, Mp.Ab.glmmTMB.red2.int_) #type 3 effect
+anova(Mp.Ab.glmmTMB, Mp.Ab.glmmTMB.red3.int_) #type 3 effect
+
+Mp.Ab.glmmTMB.REML <- update(Mp.Ab.glmmTMB, REML=TRUE)
+plot(simulateResiduals(Mp.Ab.glmmTMB.REML))
+summary(Mp.Ab.glmmTMB.REML)
+
+Trt.Mp <- lsmeans(Mp.Ab.glmmTMB.REML, specs="Treatment")
+contrast(Trt.Mp, method="trt.vs.ctrl")
+
+plot(ggemmeans(Mp.Ab.glmmTMB.REML, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of macrophytes")
+```
+
+### Detritivore density
+
+- type 3 LRT
+- Treatment: P = 0.12
+- Week: P < 0.001
+- TxP: P = 0.67
+
+```{r detritivore}
+
+Det.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                            ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Det1"), REML=FALSE, 
+                          dispformula=~0)
+Det.Ab.glmmTMB <- update(Det.Ab.glmmTMB, 
+                         control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")), 
+                         start=list(theta=c(0.0000000011, 0.0000011, 7.99, 0.3)))
+Det.Ab.glmmTMB.red1 <- update(Det.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(Det.Ab.glmmTMB)
+Det.Ab.glmmTMB.red2.int <- update(Det.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                    ar1(Week.fctr+0|Tank_Year))
+Det.Ab.glmmTMB.red3.int <- update(Det.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                    ar1(Week.fctr+0|Tank_Year))
+anova(Det.Ab.glmmTMB, Det.Ab.glmmTMB.red1) #interaction effect
+anova(Det.Ab.glmmTMB, Det.Ab.glmmTMB.red2.int) #type 3 effect
+anova(Det.Ab.glmmTMB, Det.Ab.glmmTMB.red3.int) #type 3 effect
+
+Det.Ab.glmmTMB.REML <- update(Det.Ab.glmmTMB, REML=TRUE)
+plot(simulateResiduals(Det.Ab.glmmTMB.REML))
+summary(Det.Ab.glmmTMB.REML)
+
+Trt.Det <- lsmeans(Det.Ab.glmmTMB.REML, specs="Treatment")
+contrast(Trt.Det, method="trt.vs.ctrl")
+
+plot(ggemmeans(Det.Ab.glmmTMB.REML, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of detritivores")
+```
+
+### Herbivore density
+
+- type 3 LRT
+- Treatment: P < 0.01
+- Week: P < 0.01
+- TxP: P < 0.001
+
+```{r herbivore}
+Herb.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                             ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Herb1"), REML=FALSE, 
+                           dispformula=~0)
+Herb.Ab.glmmTMB.red1 <- update(Herb.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(Herb.Ab.glmmTMB)
+Herb.Ab.glmmTMB.red2.int <- update(Herb.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                     ar1(Week.fctr+0|Tank_Year))
+Herb.Ab.glmmTMB.red2.int_ <- update(Herb.Ab.glmmTMB.red2.int, 
+                                    control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")), 
+                                    start=list(theta=c(0.00000000062, 0.00000000035, 0.94, 0.46)))
+Herb.Ab.glmmTMB.red3.int <- update(Herb.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                     ar1(Week.fctr+0|Tank_Year))
+anova(Herb.Ab.glmmTMB, Herb.Ab.glmmTMB.red1) #interaction effect
+anova(Herb.Ab.glmmTMB, Herb.Ab.glmmTMB.red2.int_) #type 3 effect
+anova(Herb.Ab.glmmTMB, Herb.Ab.glmmTMB.red3.int) #type 3 effect
+
+Herb.Ab.glmmTMB.REML <- update(Herb.Ab.glmmTMB, REML=TRUE)
+Herb.Ab.glmmTMB.REML_ <- update(Herb.Ab.glmmTMB.REML, control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")))
+plot(simulateResiduals(Herb.Ab.glmmTMB.REML_))
+summary(Herb.Ab.glmmTMB.REML_)
+
+Trt.Herb <- lsmeans(Herb.Ab.glmmTMB.REML_, specs="Treatment")
+contrast(Trt.Herb, method="trt.vs.ctrl")
+
+plot(ggemmeans(Herb.Ab.glmmTMB.REML_, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of herbivores")
+```
+
+### Phytophilous predator density
+
+- type 3 LRT
+- Treatment: P < 0.01
+- Week: P < 0.01
+- TxP: P = 0.43
+
+```{r phytophilous predator}
+PP.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                           ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Pred.P1"), REML=FALSE, 
+                         dispformula=~0)
+PP.Ab.glmmTMB.red1 <- update(PP.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+PP.Ab.glmmTMB.red3 <- update(PP.Ab.glmmTMB.red1, .~.-Week.fctr)
+full.model.mat <- model.matrix(PP.Ab.glmmTMB)
+PP.Ab.glmmTMB.red2.int <- update(PP.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+PP.Ab.glmmTMB.red2.int_ <- update(PP.Ab.glmmTMB.red2.int, 
+                                  control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")), 
+                                  start=list(theta=c(3.6, 0.00000072, 0.83, 0.47)))
+PP.Ab.glmmTMB.red3.int <- update(PP.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+anova(PP.Ab.glmmTMB, PP.Ab.glmmTMB.red1) #interaction effect
+anova(PP.Ab.glmmTMB, PP.Ab.glmmTMB.red2.int_) #type 3 effect
+anova(PP.Ab.glmmTMB, PP.Ab.glmmTMB.red3.int) #type 3 effect
+
+PP.Ab.glmmTMB.REML <- update(PP.Ab.glmmTMB, REML=TRUE)
+PP.Ab.glmmTMB.REML_ <- update(PP.Ab.glmmTMB.REML, control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")))
+plot(simulateResiduals(PP.Ab.glmmTMB.REML_))
+summary(PP.Ab.glmmTMB.REML)
+
+Trt.PP <- lsmeans(PP.Ab.glmmTMB.REML_, specs="Treatment")
+contrast(Trt.PP, method="trt.vs.ctrl")
+
+plot(ggemmeans(PP.Ab.glmmTMB.REML, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of phytophilous predators")
+```
+
+### Benthic predator density
+
+- type 3 LRT
+- Treatment: P < 0.001
+- Week: P < 0.01
+- TxP: P = 0.12
+
+```{r benthic predator}
+PB.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                           ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Pred.B1"), REML=FALSE, 
+                         dispformula=~0)
+PB.Ab.glmmTMB.red1 <- update(PB.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(PB.Ab.glmmTMB)
+PB.Ab.glmmTMB.red2.int <- update(PB.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+PB.Ab.glmmTMB.red3.int <- update(PB.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+anova(PB.Ab.glmmTMB, PB.Ab.glmmTMB.red1) #interaction effect
+anova(PB.Ab.glmmTMB, PB.Ab.glmmTMB.red2.int) #type 3 effect
+anova(PB.Ab.glmmTMB, PB.Ab.glmmTMB.red3.int) #type 3 effect
+
+PB.Ab.glmmTMB.REML <- update(PB.Ab.glmmTMB, REML=TRUE)
+plot(simulateResiduals(PB.Ab.glmmTMB.REML))
+summary(PB.Ab.glmmTMB.REML)
+
+Trt.PB <- lsmeans(PB.Ab.glmmTMB.REML, specs="Treatment")
+contrast(Trt.PB, method="trt.vs.ctrl")
+
+plot(ggemmeans(PB.Ab.glmmTMB.REML, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of benthic predators")
+```
+
+### Neustonic predator density
+
+- type 3 LRT
+- Treatment: P = 0.18
+- Week: P < 0.001
+- TxP: P = 0.31
+
+```{r surface predator}
+
+PS.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                           ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Pred.S1"), REML=FALSE, 
+                         dispformula=~0)
+PS.Ab.glmmTMB <- update(PS.Ab.glmmTMB, 
+                        control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")), 
+                        start=list(theta=c(0.029, 0.000000069, 1.1, 0.65)))
+PS.Ab.glmmTMB.red1 <- update(PS.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(PS.Ab.glmmTMB)
+PS.Ab.glmmTMB.red2.int <- update(PS.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+PS.Ab.glmmTMB.red3.int <- update(PS.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                   ar1(Week.fctr+0|Tank_Year))
+anova(PS.Ab.glmmTMB, PS.Ab.glmmTMB.red1) #interaction effect
+anova(PS.Ab.glmmTMB, PS.Ab.glmmTMB.red2.int) #type 3 effect
+anova(PS.Ab.glmmTMB, PS.Ab.glmmTMB.red3.int) #type 3 effect
+
+PS.Ab.glmmTMB.REML <- update(PS.Ab.glmmTMB, REML=TRUE)
+plot(simulateResiduals(PS.Ab.glmmTMB.REML))
+summary(PS.Ab.glmmTMB.REML)
+
+Trt.PS <- lsmeans(PS.Ab.glmmTMB.REML, specs="Treatment")
+contrast(Trt.PS, method="trt.vs.ctrl")
+
+plot(ggemmeans(PS.Ab.glmmTMB.REML, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of neustonic predators")
+```
+
+### Mollusca density
+
+- type 3 LRT
+- Treatment: P < 0.01
+- Week: P = 0.24
+- TxP: P = 0.48
+
+```{r mollusca}
+Moll.Ab.glmmTMB <- glmmTMB(scAbundance ~ Treatment*Week.fctr + (1|Tank) + (1|Year) +
+                             ar1(Week.fctr+0|Tank_Year), data=subset(na.omit(all_Ts_), Recipient=="Moll1"), REML=FALSE, 
+                           dispformula=~0)
+Moll.Ab.glmmTMB <- update(Moll.Ab.glmmTMB, 
+                          control=glmmTMBControl(optimizer=optim,optArgs=list(method="BFGS")), 
+                          start=list(theta=c(0.000019, 0.000000091, 1.01, 0.43)))
+Moll.Ab.glmmTMB.red1 <- update(Moll.Ab.glmmTMB, .~.-Treatment:Week.fctr)
+full.model.mat <- model.matrix(Moll.Ab.glmmTMB)
+Moll.Ab.glmmTMB.red2.int <- update(Moll.Ab.glmmTMB, .~full.model.mat[,-(2:4)] + 0 + (1|Tank) + (1|Year) +
+                                     ar1(Week.fctr+0|Tank_Year))
+Moll.Ab.glmmTMB.red3.int <- update(Moll.Ab.glmmTMB, .~full.model.mat[,-(5:13)] + 0 + (1|Tank) + (1|Year) +
+                                     ar1(Week.fctr+0|Tank_Year))
+anova(Moll.Ab.glmmTMB, Moll.Ab.glmmTMB.red1) #interaction effect
+anova(Moll.Ab.glmmTMB, Moll.Ab.glmmTMB.red2.int) #type 3 effect
+anova(Moll.Ab.glmmTMB, Moll.Ab.glmmTMB.red3.int) #type 3 effect
+
+Moll.Ab.glmmTMB.REML <- update(Moll.Ab.glmmTMB, REML=TRUE)
+plot(simulateResiduals(Moll.Ab.glmmTMB.REML))
+summary(Moll.Ab.glmmTMB.REML)
+
+Trt.Moll <- lsmeans(Moll.Ab.glmmTMB.REML, specs="Treatment")
+contrast(Trt.Moll, method="trt.vs.ctrl")
+
+plot(ggemmeans(Moll.Ab.glmmTMB.REML, terms=c("Week.fctr", "Treatment")), 
+     facets=TRUE, connect.lines=TRUE, rawdata=TRUE) + ggtitle("Predicted values of molluscs")
+```
+
+## Visualize data (Fig. 2a)
+
+```{r, width=8, height=4.3}
+# Visualize data
+
+labeli <- as_labeller(c(`Phytopla1`="Phytoplankton", #map facet labels
+                        `Roti1`="Rotifers",
+                        `Zoopla1`="Crustacean\nzooplankton",
+                        `Mp1`="Macrophytes",
+                        `Det1`="Detritivores",
+                        `Herb1`="Herbivores",
+                        `Pred.P1`="Phytophilous\npredators",
+                        `Pred.B1`="Benthic\npredators",
+                        `Pred.S1`="Neustonic\npredators",
+                        `Moll1`="Molluscs"))
+lab <- data.frame(lab="*", 
+                  Recipient=factor(c("Phytopla1", "Mp1", "Mp1", 
+                                 "Herb1", "Pred.P1", "Pred.P1", 
+                                 "Pred.B1", "Pred.B1", "Moll1"), 
+                               levels=c("Phytopla1", "Roti1", "Zoopla1", "Mp1", 
+                                        "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Moll1")))
+
+palSet1 <- brewer.pal(9, "Set1")
+
+theme_custom <- function() {
+  theme_bw() + 
+    theme(axis.text=element_text(colour="black"), 
+          axis.ticks=element_line(colour="black"),
+          panel.border=element_rect(fill=NA, 
+                                    colour="black"), 
+          panel.spacing=unit(3, "pt"),
+          strip.text=element_text(colour="black", lineheight=0.7))
+}
+
+set.seed(1)
+density.boxplot_gg <- 
+  ggplot(na.omit(filter(all_Ts, Recipient!="Pred.C1")), mapping=aes(x=Treatment, y=scAbundance)) +
+  geom_boxplot(mapping=aes(fill=Treatment), outlier.shape=NA, size=0.3, colour="black") + 
+  scale_fill_manual(values=palSet1[c(9, 1, 2, 3)]) + 
+  geom_jitter(width=0.2, size=0.1) + 
+  facet_wrap(~Recipient, nrow=2, labeller=labeli) + 
+  scale_x_discrete(labels=c("C", "I", "H", "I+H")) + 
+  theme_custom() + #theme
+  theme(strip.background=element_blank(), legend.position="none") +
+  geom_text(data=lab, aes(label=lab), x=c(4, 3, 4, 4, 2, 4, 2, 4, 4), y=2.5, size=10) +
+  labs(y="Standardized density") 
+
+density.boxplot_gg # Fig. 2a
+```

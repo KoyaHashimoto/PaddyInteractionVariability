@@ -1,0 +1,292 @@
+---
+title: "Overview of S-map coefficient results"
+author: "Koya Hashimoto"
+date: "2023/10/6"
+output: html_document
+---
+
+# Overview of S-map coefficient results
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load required packages
+
+```{r library}
+sessionInfo()
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(igraph)
+library(RColorBrewer)
+```
+
+### Data compilation
+
+```{r data}
+all_multsmap_coefs <- read.csv("./processed_data/all_regulsmap_coefs240123.csv")
+head(all_multsmap_coefs)
+
+all_multsmap_coefs$Recipient <- 
+  factor(all_multsmap_coefs$Recipient, 
+         levels=unique(all_multsmap_coefs$Recipient))
+all_multsmap_coefs$Donor <- 
+  factor(all_multsmap_coefs$Donor, 
+         levels=c("Phytopla1", "Phytopla1_1", "Roti1", "Roti1_1", "Roti1_2", 
+                  "Zoopla1", "Zoopla1_1", "Zoopla1_2", "Zoopla1_3", "Zoopla1_4", 
+                  "Mp1", "Mp1_1", "Det1", "Herb1", "Herb1_1", "Herb1_2", 
+                  "Pred.P1", "Pred.P1_1", "Pred.P1_2", "Pred.P1_3", "Pred.B1", 
+                  "Pred.S1", "Pred.S1_1", "Pred.S1_2", "Pred.S1_3", "Moll1", "0"))
+all_multsmap_coefs$Treatment <- factor(all_multsmap_coefs$Treatment, levels=c("Cont", "Fipro", "Pent", "Joint"))
+```
+
+## Overview
+
+### Furequency distribution of mean S-map coefs
+
+```{r IS distribution}
+all_multsmap_coefs <- 
+  all_multsmap_coefs %>%
+  unite(col="Recipient_Donor", Recipient, Donor, remove=FALSE)
+all_multsmap_coefs_smrz <- 
+  all_multsmap_coefs %>%
+  group_by(Treatment, Recipient, Donor, r_d, Recipient_Donor, Year, Tank) %>%
+  summarise(smap_coef=mean(smap_coef, na.rm=TRUE)) %>%
+  group_by(Treatment, Recipient, Donor, r_d, Recipient_Donor) %>%
+  summarise(smap_coef=mean(smap_coef, na.rm=TRUE))
+
+all_multsmap_coefs_smrz_intersp <- 
+  all_multsmap_coefs_smrz %>%
+  separate(Donor, into=c("Donor_", "delay"), sep="_", remove=FALSE) %>%
+  filter(Recipient!=Donor_ & r_d!="c_0") %>%
+  select(-Donor_, - delay)
+
+all_multsmap_coefs_smrz_intersp_abs <- 
+  all_multsmap_coefs_smrz_intersp %>%
+  mutate(Sign=ifelse(smap_coef>0, "Positive", "Negative"), abs_smap_coef=abs(smap_coef)) %>%
+  arrange(Treatment, Recipient, Donor)
+
+f_labels <- data.frame(Treatment=c("Cont", "Fipro", "Pent", "Joint"), 
+                       label=rep("↓", times=4), 
+                       x=tapply(all_multsmap_coefs_smrz_intersp_abs$abs_smap_coef, 
+                                all_multsmap_coefs_smrz_intersp_abs$Treatment, 
+                                function(x) median(x, na.rm=TRUE)), 
+                       y=rep(7, times=4))
+ggplot(all_multsmap_coefs_smrz_intersp_abs) +
+  geom_histogram(position="stack", binwidth=0.05, mapping=aes(x=abs_smap_coef, fill=Sign)) + facet_wrap(~Treatment) +
+  geom_text(data=f_labels, aes(label=label, x=x, y=y), size=10)
+```
+
+### Networks
+
+*Orange: negative effect. Blue: positive effect. Thickness: mean interaction strength. Dashed arrow: 0.05<P<0.1.
+
+```{r interaction network, fig.width=9, fig.height=8}
+library(igraph)
+g1 <- graph(edges=c(2,1, 5,1, 7,1,
+                    1,2, 6,2, 7,2,
+                    2,3,
+                    2,4, 6,4, 7,4,
+                    1,5, 2,5, 4,5,
+                    1,6, 4,6, 5,6,
+                    2,7,
+                    4,9,
+                    2,10, 3,10, 6,10, 8,10, 9,10), n=10, directed=T)
+IS.Tr.mean <- all_multsmap_coefs_smrz_intersp_abs
+V(g1)$name <- c("Phytopla", "Rotifer", "Zoopla.Cru", "Macrophyte", "Detritivore", "Herbivore",
+                "Phyto.predator", "Bent.predator", "Surf.predator", "Mollusca") #save nodes' names
+l <- layout_in_circle(g1) #layout in circle
+
+#each treatment
+par(mfrow=c(2, 2), mar=c(3, 3, 3, 3), family="sans")
+for (i in c("Cont", "Fipro", "Pent", "Joint")){
+  plot(g1, layout=l, vertex.label.family="sans",
+       edge.lty=c(1, 2, 1,
+                  1, 1, 1,
+                  1,
+                  1, 1, 1,
+                  1, 2, 1,
+                  1, 1, 1,
+                  1,
+                  1,
+                  1, 1, 1, 1, 1),
+       edge.color=c(ifelse(subset(IS.Tr.mean, Treatment==i)[,"Sign"]=="Positive", 2, 6)),
+       edge.curved=0.1,
+       edge.width=subset(IS.Tr.mean, Treatment==i)$abs_smap_coef*20)
+  legend("topleft", legend=i, bty="n", x.intersp=0, y.intersp=0, cex=1.2)
+  if (i=="Fipro") text(c(-0.98, -0.44), c(-0.73, -1.14), labels="*", cex=4) else {
+    if (i=="Pent") text(-0.42, 1.12, labels="*", cex=4) else { 
+      if (i=="Joint") text(c(-0.98, -0.44, 0.92, 1.1, -0.42, -1.09),
+                           c(-0.73, -1.14, -0.73, -0.11, 1.12, -0.11),
+                           labels=c("*", "*", "**", "*", "*", "*"), cex=4)
+    }
+  }
+  
+}
+```
+
+## Generate Fig. S2
+
+```{r suppl, fig.width=7, fig.height=10}
+
+palSet1 <- brewer.pal(9, "Set1")
+
+g1 <- graph(edges=c(2,1, 5,1, 7,1, 
+                    1,2, 6,2, 7,2, 
+                    2,3, 
+                    2,4, 6,4, 7,4, 
+                    1,5, 2,5, 4,5,
+                    1,6, 4,6, 5,6, 
+                    2,7, 
+                    4,9,
+                    2,10, 3,10, 6,10, 8,10, 9,10), n=10, directed=T)
+
+V(g1)$name <- c("Phytoplankton", "Rotifers", "Crustacean\nzooplankton", "Macrophytes", 
+                "Detritivores", "Herbivores", 
+                "Phytophilous\npredators", "Benthic\npredators", "Neustonic\npredators", "Molluscs") #save nodes' names
+l <- layout_in_circle(g1) #layout in circle
+
+#windows(7, 10, rescale="fixed")
+#pdf("all_networks.pdf", width=7, height=10)
+layout(matrix(c(1, 2, 5, 6, 3, 4, 7, 8), ncol=2, byrow=TRUE), heights=c(2.5, 1, 2.5, 1))
+#each treatment
+par(mar=c(2, 2, 2, 2), family="sans")
+plot(g1, layout=l, vertex.label.family="sans",
+     edge.lty=c(1, 2, 1, 
+                1, 1, 1,
+                1, 
+                1, 1, 1, 
+                1, 2, 1, 
+                1, 1, 1, 
+                1, 
+                1, 
+                1, 1, 1, 1, 1), 
+     edge.color=c(ifelse(subset(IS.Tr.mean, Treatment=="Cont")[,"Sign"]=="Positive", palSet1[2], palSet1[1])), 
+     edge.curved=0.1, 
+     edge.width=subset(IS.Tr.mean, Treatment=="Cont")$abs_smap_coef*20, 
+     vertex.label.dist=1.5, vertex.label.degree=-pi/2, 
+     vertex.label.color="black")
+legend("topleft", legend="a", bty="n", xpd=NA, x.intersp=-1, y.intersp=-1, cex=1.5, text.font=2)
+legend("topleft", legend="C", bty="n", x.intersp=1, y.intersp=1, cex=1.5, text.font=2)
+
+plot(g1, layout=l, vertex.label.family="sans",
+     edge.lty=c(1, 2, 1, 
+                1, 1, 1,
+                1, 
+                1, 1, 1, 
+                1, 2, 1, 
+                1, 1, 1, 
+                1, 
+                1, 
+                1, 1, 1, 1, 1), 
+     edge.color=c(ifelse(subset(IS.Tr.mean, Treatment=="Fipro")[,"Sign"]=="Positive", palSet1[2], palSet1[1])), 
+     edge.curved=0.1, 
+     edge.width=subset(IS.Tr.mean, Treatment=="Fipro")$abs_smap_coef*20, 
+     vertex.label.dist=1.5, vertex.label.degree=-pi/2, 
+     vertex.label.color="black")
+legend("topleft", legend="b", bty="n", xpd=NA, x.intersp=-1, y.intersp=-1, cex=1.5, text.font=2)
+legend("topleft", legend="I", bty="n", x.intersp=1, y.intersp=1, cex=1.5, text.font=2)
+text(c(-0.98, -0.44), c(-0.73, -1.14), labels="*", cex=4)
+
+plot(g1, layout=l, vertex.label.family="sans",
+     edge.lty=c(1, 2, 1, 
+                1, 1, 1,
+                1, 
+                1, 1, 1, 
+                1, 2, 1, 
+                1, 1, 1, 
+                1, 
+                1, 
+                1, 1, 1, 1, 1), 
+     edge.color=c(ifelse(subset(IS.Tr.mean, Treatment=="Pent")[,"Sign"]=="Positive", palSet1[2], palSet1[1])), 
+     edge.curved=0.1, 
+     edge.width=subset(IS.Tr.mean, Treatment=="Pent")$abs_smap_coef*20, 
+     vertex.label.dist=1.5, vertex.label.degree=-pi/2, 
+     vertex.label.color="black")
+legend("topleft", legend="e", bty="n", xpd=NA, x.intersp=-1, y.intersp=-1, cex=1.5, text.font=2)
+legend("topleft", legend="H", bty="n", x.intersp=1, y.intersp=1, cex=1.5, text.font=2)
+text(-0.42, 1, labels="*", cex=4)
+
+plot(g1, layout=l, vertex.label.family="sans",
+     edge.lty=c(1, 2, 1, 
+                1, 1, 1,
+                1, 
+                1, 1, 1, 
+                1, 2, 1, 
+                1, 1, 1, 
+                1, 
+                1, 
+                1, 1, 1, 1, 1), 
+     edge.color=c(ifelse(subset(IS.Tr.mean, Treatment=="Joint")[,"Sign"]=="Positive", palSet1[2], palSet1[1])), 
+     edge.curved=0.1, 
+     edge.width=subset(IS.Tr.mean, Treatment=="Joint")$abs_smap_coef*20, 
+     vertex.label.dist=1.5, vertex.label.degree=-pi/2, 
+     vertex.label.color="black")
+legend("topleft", legend="f", bty="n", xpd=NA, x.intersp=-1, y.intersp=-1, cex=1.5, text.font=2)
+legend("topleft", legend="I+H", bty="n", x.intersp=1, y.intersp=1, cex=1.5, text.font=2)
+text(c(-0.98, -0.44, 0.92, 1.1, -0.42, -1.09), 
+     c(-0.73, -1.14, -0.73, -0.11, 1, -0.11), 
+     labels=c("*", "*", "**", "*", "*", "*"), cex=4)
+
+
+par(mar=c(4, 2, 0, 2), mgp=c(2.5, 1, 0), las=1, family="sans", cex=0.8)
+for (i in 1:4) {
+  hist(subset(IS.Tr.mean, Treatment==c("Cont", "Fipro", "Pent", "Joint")[i])$abs_smap_coef, breaks=seq(0, 0.5, 0.05),
+       xlab="Mean interaction strength", col=palSet1[1], main=c("")[i])
+  lines(hist(subset(IS.Tr.mean, Treatment==c("Cont", "Fipro", "Pent", "Joint")[i] & Sign=="Positive")$abs_smap_coef, plot=FALSE, 
+             breaks=seq(0, 0.5, 0.05)), col=palSet1[2], xlim=c(0, 0.5))
+  arrows(median(subset(IS.Tr.mean, Treatment==c("Cont", "Fipro", "Pent", "Joint")[i])$abs_smap_coef), 9, 
+         median(subset(IS.Tr.mean, Treatment==c("Cont", "Fipro", "Pent", "Joint")[i])$abs_smap_coef), 8, code=2, length=0.05, lwd=2, xpd=NA)
+  legend("topright", legend=c("Negative interactions", "Positive interactions"), bty="n",
+         pt.bg=palSet1[1:2], pch=22, plot=c(TRUE, FALSE, FALSE, FALSE)[i], pt.cex=2)
+  legend("topleft", legend=c("c", "d", "g", "h")[i], 
+         bty="n", xpd=NA, x.intersp=-1.2, y.intersp=-2, cex=1.2, text.font=2)
+}
+dev.off()
+```
+
+## Source of variation in the S-map coefs (Fig. S5) 
+
+We performed two-way ANOVA for every interaction link, examining the effects of treatment, census date and their interaction on S-map coefficient values, to confirm whether the temporal fluctuations of the interaction effect were consistent among replicates. The mean squares of residuals are unbiased estimates of the variance of various noises including differences in individual replicates. If these values are small relative to those of census dates or treatments, temporal fluctuations of s-map coefs should be considered as relatively consistent among replicates.
+
+```{r smap coef source of variation, fig.width=6, fig.height=6}
+all_multsmap_coefs <- 
+  all_multsmap_coefs %>%
+  unite(col="Recipient_Donor", Recipient, Donor, remove=FALSE)
+
+anova_res <- 
+  all_multsmap_coefs %>%
+  unite("Year_Week", Year, Week, sep="_", remove=FALSE) %>%
+  split(., .$Recipient_Donor) %>%
+  lapply(., function(data) {
+    res <- as.data.frame(anova(lm(smap_coef ~ Treatment * Year_Week, data)))
+    res <- cbind(Source=rownames(res), res)
+    res}) %>%
+  do.call(rbind, .) %>% 
+  cbind(., Recipient_Donor=rep(unique(all_multsmap_coefs$Recipient_Donor), each=4))
+
+theme_set(theme_bw())
+anova_res$Source <- factor(anova_res$Source, levels=unique(anova_res$Source))
+ggplot(anova_res, aes(y=!!as.name("Mean Sq"), x=Source, group=Recipient_Donor)) + 
+  geom_point() + geom_line() + scale_y_log10() + 
+  ylab("Mean squares") + scale_x_discrete(labels=c("Treatment"="Treatment", 
+                                                   "Year_Week"="Census date", 
+                                                   "Treatment:Year_Week"="Treatment x Census date", 
+                                                   "Residuals"="Residuals"))
+
+ggplot(anova_res, aes(y=!!as.name("F value"), x=Source, group=Recipient_Donor)) + 
+  geom_point() + geom_line() + scale_y_log10()
+
+F_value_count <- matrix(c(nrow(subset(anova_res, Source=="Treatment" & anova_res[,"F value"]<=1)),
+                          nrow(subset(anova_res, Source=="Treatment" & anova_res[,"F value"]>1)),
+                          nrow(subset(anova_res, Source=="Year_Week" & anova_res[,"F value"]<=1)),
+                          nrow(subset(anova_res, Source=="Year_Week" & anova_res[,"F value"]>1)),
+                          nrow(subset(anova_res, Source=="Treatment:Year_Week" & anova_res[,"F value"]<=1)),
+                          nrow(subset(anova_res, Source=="Treatment:Year_Week" & anova_res[,"F value"]>1))), nrow=3, byrow=TRUE)
+rownames(F_value_count) <- c("Treatment", "Year_Week", "Treatment:Year_Week")
+colnames(F_value_count) <- c("F<=1", "F>1")
+F_value_count
+```

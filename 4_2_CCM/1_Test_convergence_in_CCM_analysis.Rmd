@@ -1,0 +1,321 @@
+---
+title: "Test convergence in CCM analysis (2017-2019 composite)"
+author: "Koya Hashimoto"
+date: "2024/8/23"
+output: html_document
+---
+
+# Test convergence in CCM analysis (2017-2019 composite)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Set up
+
+### Load required packages
+
+```{r packages}
+sessionInfo()
+
+library(rEDM); packageVersion("rEDM") #0.7.5
+library(tidyr); packageVersion("tidyr")
+library(dplyr); packageVersion("dplyr")
+```
+
+### Data compile
+
+Using unprocessed data (PlaData171819_corrected.csv, MacrophyteData171819.csv, and animaldata171819.completegathered.fixed.csv) instead of processed, exported data (all_Ts240123.csv) to avoid roundoff errors and to reproduce identical results from the manuscripts. The data compilation script are copied from "Data_processsing.md".
+
+```{r  data, fig.width=10, fig.height=10}
+PlanktonData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/PlaData171819_corrected.csv", header=TRUE)
+MacrophyteData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/MacrophyteData171819.csv", header=TRUE)
+AnimalData <- read.csv("../EDM2017-2019_analysis/Data2017-2019/animaldata171819.completegathered.fixed.csv", header=TRUE)
+
+# Data compilation
+
+data_definefctr <- function(data) {
+  data$Insecticide <- as.factor(data$Insecticide)
+  data$Herbicide <- as.factor(data$Herbicide)
+  data$Treatment <- factor(data$Treatment, levels=c("Cont", "Fipro", "Pent", "Joint")) #Define category order
+  data$Tank <- factor(data$Tank, levels=c("Cont1", "Cont2", "Fipro1", "Fipro2", "Pent1", "Pent2", "Joint1", "Joint2"))
+  data$Year_Tank <- with(data, paste(Year, Tank, sep="_")) #Define unit of analyses
+  data$Year_Tank <- 
+    factor(data$Year_Tank, 
+           levels=c("2017_Cont1", "2017_Cont2", "2017_Fipro1", "2017_Fipro2", 
+                    "2017_Pent1", "2017_Pent2", "2017_Joint1", "2017_Joint2", 
+                    "2018_Cont1", "2018_Cont2", "2018_Fipro1", "2018_Fipro2", 
+                    "2018_Pent1", "2018_Pent2", "2018_Joint1", "2018_Joint2", 
+                    "2019_Cont1", "2019_Cont2", "2019_Fipro1", "2019_Fipro2", 
+                    "2019_Pent1", "2019_Pent2", "2019_Joint1", "2019_Joint2")) #Define category order
+  return(data)
+}
+
+PlanktonData <- data_definefctr(PlanktonData)
+MacrophyteData <- data_definefctr(MacrophyteData)
+MacrophyteData$SubPlot <- as.factor(MacrophyteData$SubPlot)
+AnimalData <- data_definefctr(AnimalData)
+
+# Split by functional groups
+
+Phytopla <- 
+  PlanktonData %>%
+  filter(Group=="Diatom" | Group=="Flagellate" | Group=="GreenAlgae") %>% # Omit unnecessary taxa
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+Roti <- 
+  PlanktonData %>%
+  filter((Group=="Rotifer") & Species_each_file!="Nauplius_(E._japonicus)") %>%  #omit a different sampling protocol
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+#Miki Hirao counted all individuals in 1L sample, whereas Ji Cai took 1/10 subsample from 500mL sample and counted individuals in the 1/10 subsample
+ZooplaCr <- 
+  PlanktonData %>%
+  filter((Group=="Cladocera" | Group=="Copepoda" | Group=="Ostracoda") & Species_each_file!="Nauplius_(E._japonicus)") %>%  #omit a different sampling protocol
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+Mp <- 
+  MacrophyteData %>%
+  group_by(Year, Tank, Week, SubPlot, Year_Tank) %>%
+  summarise(Cover=sum(Cover)) %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=mean(Cover)) %>%
+  ungroup(.) %>% filter(Week>1)
+Det <- 
+  AnimalData %>%
+  filter(Function=="Detritivore") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+Herb <- 
+  AnimalData %>%
+  filter(Function=="Herbivore") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+Pred <- 
+  AnimalData %>%
+  filter(Function=="Predator") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+
+Pred.P <- 
+  AnimalData %>%
+  filter(Function=="Predator" & Habitat=="Phytophilous") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+Pred.B <-   AnimalData %>%
+  filter(Function=="Predator" & Habitat=="Benthic") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+Pred.S <-   AnimalData %>%
+  filter(Function=="Predator" & Habitat=="Neustonic") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+Pred.C <-   AnimalData %>%
+  filter(Function=="Predator" & Habitat=="Nektonic") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+
+Mollusca <- 
+  AnimalData %>%
+  filter(Species=="Bivalvia_sp" | Species=="Physa_acuta") %>%
+  group_by(Year, Tank, Week, Year_Tank) %>%
+  summarise(Abundance=sum(Abundance)) %>%
+  ungroup(.) %>% filter(Week>1)
+
+Commulist <- list(Phytopla, Roti, ZooplaCr, Mp, Det, Herb, Pred.P, Pred.B, Pred.S, Pred.C, Mollusca)
+names(Commulist) <- c("Phytopla", "Roti", "ZooplaCr", "Mp", "Det", "Herb", "Pred.P", "Pred.B", "Pred.S", "Pred.C", "Mollusca")
+
+# Log-transformation and standardization
+
+Tslist <- lapply(1:11, function(i) {
+  Commulist[[i]] %>%
+    select(Week, Year_Tank, Abundance) %>%
+    spread(key=Year_Tank, value=Abundance) %>% # Remove unnecessary columns
+    rbind(., rep(NaN, ncol(.))) %>% # Add NaN to separate different tanks, but not necessary if you correctly specify lib parameters
+    gather(Year_Tank, Abundance, -Week) %>% # Gather data for EDM
+    mutate(Year_Tank=factor(Year_Tank, levels=c("2017_Cont1", "2017_Cont2", "2017_Fipro1", "2017_Fipro2", 
+                                                "2017_Pent1", "2017_Pent2", "2017_Joint1", "2017_Joint2", 
+                                                "2018_Cont1", "2018_Cont2", "2018_Fipro1", "2018_Fipro2", 
+                                                "2018_Pent1", "2018_Pent2", "2018_Joint1", "2018_Joint2", 
+                                                "2019_Cont1", "2019_Cont2", "2019_Fipro1", "2019_Fipro2", 
+                                                "2019_Pent1", "2019_Pent2", "2019_Joint1", "2019_Joint2")))
+} 
+)
+
+names(Tslist) <- 
+  c("Phytopla1", "Roti1", "Zoopla1", "Mp1", "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Pred.C1", "Moll1")
+
+lapply(c("Phytopla1", "Roti1", "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Pred.C1", "Moll1"), 
+       function(i) { 
+         Tslist[[i]] <<- mutate(Tslist[[i]], scAbundance=as.numeric(scale(log(Abundance+1))))
+       }
+)
+
+Tslist[["Mp1"]] <- mutate(Tslist[["Mp1"]], scAbundance=as.numeric(scale(Abundance)))
+
+Tslist[["Zoopla1"]] <- 
+  Tslist[["Zoopla1"]] %>%
+  separate(Year_Tank, into=c("Year", "Tank")) %>%
+  group_by(Year) %>%
+  mutate(scAbundance=as.numeric(scale(log(Abundance*ifelse(Year==2017, 1, 20)+1)))) %>%
+  unite(Year, Tank, col="Year_Tank")
+
+all_Ts <- 
+  lapply(1:11, function(i) {
+    mutate(Tslist[[i]], Recipient=names(Tslist)[i])
+  }) %>% do.call(rbind, .)
+
+all_Ts <- #define necessary columns
+  all_Ts %>%
+  separate(Year_Tank, into=c("Year", "Tank"), sep="_") %>% #year and tank
+  mutate(Treatment=substr(Tank, 1, nchar(Tank)-1)) %>% #treatment name
+  mutate(Treatment=factor(Treatment, levels=c("Cont", "Fipro", "Pent", "Joint")), #order of treatment names
+         Tank=factor(Tank, levels=unique(Tank)), #order of tanks
+         Recipient=factor(Recipient, levels=c("Phytopla1", "Roti1", "Zoopla1", "Mp1", 
+                                              "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Moll1"))) 
+
+Phytopla1 <- subset(all_Ts, Recipient=="Phytopla1")
+Roti1 <- subset(all_Ts, Recipient=="Roti1")
+Zoopla1 <- subset(all_Ts, Recipient=="Zoopla1")
+Mp1 <- subset(all_Ts, Recipient=="Mp1")
+Det1 <- subset(all_Ts, Recipient=="Det1")
+Herb1 <- subset(all_Ts, Recipient=="Herb1")
+Pred.P1 <- subset(all_Ts, Recipient=="Pred.P1")
+Pred.B1 <- subset(all_Ts, Recipient=="Pred.B1")
+Pred.S1 <- subset(all_Ts, Recipient=="Pred.S1")
+Moll1 <- subset(all_Ts, Recipient=="Moll1")
+```
+
+## Save best embedding dimensions and library snd set params
+
+- See "Characteristics of time series (2017-2019 composite).html"
+
+```{r save E and library}
+EPh <- 5; ERo <- 6; EZo <- 6; EMp <- 5; EDet <- 4; EHerb <- 6; EPP <- 5; EPB <- 2; EPS <- 5; EMoll <- 4
+namedlist1 <- function(...){
+  setNames(list(...), eval(substitute(alist(...))))
+}
+E_list <- namedlist1(EPh, ERo, EZo, EMp, EDet, EHerb, EPP, EPB, EPS, EMoll)
+
+lib_custom <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87), #define library
+                     c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+88, 
+                     c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+176), ncol=2, byrow=TRUE)
+lib_custom_Mp <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87), #define library of macrophye
+                       c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+88, 
+                       c(2,10, 13,21, 24,32, 35,43, 46,54, 57,65, 68,76, 79,87)+176), ncol=2, byrow=TRUE)
+No.samp <- 3
+```
+
+## CCM analysis
+
+### Define utility functions
+
+```{r define functions}
+ccm_conv_test <- function(effect, cause, E) {
+  ccm_res <- ccm(cbind(effect, cause), E=E, lib=lib_custom, RNGseed=sample(1:1000000000, 1),
+                 lib_sizes=seq(E+1, length(effect)-(E-1)*24-24+2, by=3), silent=TRUE, replace=FALSE, num_samples=No.samp)
+  xmap_mean <- ccm_means(na.omit(ccm_res))
+  xmap_95 <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.95)
+  xmap_9 <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.9)
+  xmap_ucl <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.975)
+  xmap_lcl <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.025)
+  xmap_conv <- subset(xmap_mean, lib_size==max(lib_size))$rho - subset(xmap_mean, lib_size==min(lib_size))$rho
+  list(ccm_res, xmap_mean, xmap_95, xmap_9, xmap_ucl, xmap_lcl, xmap_conv)
+}
+
+ccm_conv_test_Mp <- function(effect, cause, E) {
+  ccm_res <- ccm(cbind(effect, cause), E=E, lib=lib_custom_Mp, RNGseed=sample(1:1000000000, 1),
+                 lib_sizes=seq(E+1, length(effect)-(E-1)*24-24+2, by=3), silent=TRUE, replace=FALSE, num_samples=No.samp)
+  xmap_mean <- ccm_means(na.omit(ccm_res))
+  xmap_95 <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.95)
+  xmap_9 <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.9)
+  xmap_ucl <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.975)
+  xmap_lcl <- ccm_means(na.omit(ccm_res), FUN=quantile, probs=0.025)
+  xmap_conv <- subset(xmap_mean, lib_size==max(lib_size))$rho - subset(xmap_mean, lib_size==min(lib_size))$rho
+  list(ccm_res, xmap_mean, xmap_95, xmap_9, xmap_ucl, xmap_lcl, xmap_conv)
+}
+
+ccm_vis <- function(ccm_res_list, main) {
+  plot(rho ~ lib_size, ccm_res_list[[2]], type="l", main=main, 
+       ylim=c((ccm_res_list[[2]][1, 9]+ccm_res_list[[6]][1, 9]/2), max(ccm_res_list[[5]][, 9])+0.2))
+  lines(rho ~ lib_size, ccm_res_list[[5]], type="l", lty=3)
+  lines(rho ~ lib_size, ccm_res_list[[6]], type="l", lty=3)
+  legend("topright", 
+         legend=paste("Diff. rho:", 
+                      c(as.character(round(ccm_res_list[[7]], digits=3))), sep=" "), bty="n")
+  abline(h=0, lty=2)
+}
+```
+
+## Do CCM repeatedly
+
+```{r ccm repeat, fig.width=10, fig.height=4}
+set.seed(1)
+LIST <- NULL
+for (i in 1:45) {
+  combn.names <- combn(levels(all_Ts$Recipient), m=2)
+  combn.E <- combn(names(E_list), m=2)
+  dat1 <- get(combn.names[2,i])
+  dat2 <- get(combn.names[1,i])
+  E1 <- as.numeric(E_list[combn.E[2,i]])
+  E2 <- as.numeric(E_list[combn.E[1,i]])
+  
+  effect <- dat1$scAbundance; cause <- dat2$scAbundance; E <- E1
+  res_list1 <- ccm_conv_test(effect, cause, E)
+  xmap.name <-paste(combn.names[2, i], combn.names[1, i], sep="_xmap_")
+  write.csv(res_list1[[1]], paste("./CCM/ProcessedData/ccm_res_", xmap.name, ".csv", sep=""), row.names=FALSE)
+  LIST <- c(LIST, list(res_list1))
+  names(LIST)[length(LIST)] <- xmap.name
+
+  effect <- dat2$scAbundance; cause <- dat1$scAbundance; E <- E2
+  res_list2 <- ccm_conv_test(effect, cause, E)
+  xmap.name <-paste(combn.names[1, i], combn.names[2, i], sep="_xmap_")
+  write.csv(res_list2[[1]], paste("./CCM/ProcessedData/ccm_res_", xmap.name, ".csv", sep=""), row.names=FALSE)
+  LIST <- c(LIST, list(res_list2))
+  names(LIST)[length(LIST)] <- xmap.name
+}
+
+grid.names <- subset(expand.grid(levels(all_Ts$Recipient), levels(all_Ts$Recipient)), Var1!=Var2)
+xmap.names <- with(grid.names, paste(Var2, Var1, sep="_xmap_"))
+LIST <- LIST[xmap.names]
+
+# visualize an example
+par(mfrow=c(1, 2), las=1, cex=1, family="sans")
+ccm_vis(LIST["Mp1_xmap_Det1"][[1]], main="Macrophytes xmap Detritivores")
+ccm_vis(LIST["Det1_xmap_Mp1"][[1]], main="Detritivores xmap Macrophytes")
+```
+
+## Summary of CCM results
+
+```{r res mat}
+z <- NULL
+for (i in 1:90){
+  z <- append(z, subset(LIST[[i]][[2]], lib_size==max(lib_size))$rho)
+}
+maxrho_mat <- matrix(c(as.vector(rbind(NA, matrix(z, ncol=9))), NA), ncol=10)
+rownames(maxrho_mat) <- c("c_Ph", "c_Ro", "c_Zo", "c_Mp", "c_Det", "c_Herb", "c_PP", "c_PB", "c_PS", "c_Moll")
+colnames(maxrho_mat) <- c("e_Ph", "e_Ro", "e_Zo", "e_Mp", "e_Det", "e_Herb", "e_PP", "e_PB", "e_PS", "e_Moll")
+t(round(maxrho_mat, digits=4))
+
+z <- NULL
+for (i in 1:90){
+  z <- append(z, LIST[[i]][[7]])
+}
+conv_mat <- matrix(c(as.vector(rbind(NA, matrix(z, ncol=9))), NA), ncol=10)
+rownames(conv_mat) <- c("c_Ph", "c_Ro", "c_Zo", "c_Mp", "c_Det", "c_Herb", "c_PP", "c_PB", "c_PS", "c_Moll")
+colnames(conv_mat) <- c("e_Ph", "e_Ro", "e_Zo", "e_Mp", "e_Det", "e_Herb", "e_PP", "e_PB", "e_PS", "e_Moll")
+t(round(conv_mat, digits=4))
+
+write.csv(maxrho_mat, "./CCM/ccm_tables/maxrho_mat.csv")
+write.csv(conv_mat, "./CCM/ccm_tables/conv_mat.csv")
+```

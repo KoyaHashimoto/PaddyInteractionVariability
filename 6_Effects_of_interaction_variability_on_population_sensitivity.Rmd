@@ -1,0 +1,285 @@
+---
+title: "Effects of interaction variability on population sensitivity"
+author: "Koya Hashimoto"
+date: "2024/8/20"
+output: html_document
+---
+
+# Effects of intereaction variability on population sensitivity tested by multiple regression approaches
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load required packages
+
+```{r library}
+sessionInfo() #save session information
+
+library(ggplot2); packageVersion("ggplot2") #3.3.2
+library(dplyr); packageVersion("dplyr") #1.0.2
+library(tidyr); packageVersion("tidyr") #1.1.2
+library(patchwork); packageVersion("patchwork") #1.1.1
+library(RColorBrewer); packageVersion("RColorBrewer") #1.1.2
+library(glmmTMB); packageVersion("glmmTMB") #1.0.2.1
+library(visreg); packageVersion("visreg") #2.7.0
+library(ggeffects); packageVersion("ggeffects") #1.2.0
+library(lme4); packageVersion("lme4") #1.1.25
+library(car); packageVersion("car") #3.0.10
+library(emmeans); packageVersion("emmeans") #1.5.2.1
+library(afex); packageVersion("afex") #0.28.0
+```
+
+## Data compilation
+
+```{r data}
+all_multsmap_coefs <- read.csv("./processed_data/all_regulsmap_coefs240123.csv")
+all_Ts <- read.csv("./processed_data/all_Ts240123.csv")
+Abundance_TrEff <- read.csv("./processed_data/Abundance_TrEff.csv", header=TRUE) #load population sensitivity data
+
+all_multsmap_coefs$Recipient <- #define necessary columns
+  factor(all_multsmap_coefs$Recipient, 
+         levels=unique(all_multsmap_coefs$Recipient))
+all_multsmap_coefs$Donor <- 
+  factor(all_multsmap_coefs$Donor, 
+         levels=c("Phytopla1", "Phytopla1_1", "Roti1", "Roti1_1", "Roti1_2", 
+                  "Zoopla1", "Zoopla1_1", "Zoopla1_2", "Zoopla1_3", "Zoopla1_4", 
+                  "Mp1", "Mp1_1", "Det1", "Herb1", "Herb1_1", "Herb1_2", 
+                  "Pred.P1", "Pred.P1_1", "Pred.P1_2", "Pred.P1_3", "Pred.B1", 
+                  "Pred.S1", "Pred.S1_1", "Pred.S1_2", "Pred.S1_3", "Moll1", "0"))
+all_multsmap_coefs$Treatment <- factor(all_multsmap_coefs$Treatment, levels=c("Cont", "Fipro", "Pent", "Joint"))
+all_multsmap_coefs <- 
+  all_multsmap_coefs %>%
+  unite(col="Recipient_Donor", Recipient, Donor, remove=FALSE)
+
+```
+
+## Extract interaction density-dependence
+
+Density-dependence in per capita interaction effects were detemined by regressing S-map coefs by recipient density at each time point.
+
+```{r caluc IS density dependence}
+all_multsmap_coefs_intersp <- 
+  all_multsmap_coefs %>%
+  separate(Donor, into=c("Donor_", "delay"), sep="_", remove=FALSE) %>% 
+  filter(Recipient!=Donor_ & r_d!="c_0") %>% 
+  select(-Donor_, - delay)%>% 
+  unite("Year_Tank", Year, Tank, remove=FALSE) %>%
+  ungroup(.)
+
+all_multsmap_coefs_intersp_ab <- left_join(mutate(all_multsmap_coefs_intersp, Year=as.character(Year)), all_Ts)
+
+
+ddepend_lmres_list <-
+  all_multsmap_coefs_intersp_ab %>%
+  unite("Recipient_Donor", Recipient_Donor) %>%
+  split(., f=.$Recipient_Donor) %>%
+  lapply(function(data) as.data.frame(summary(lm(smap_coef ~ scAbundance, data))$coefficients)) #regressions in parallel
+
+ddepend_lmres <-
+  ddepend_lmres_list %>% do.call(rbind, .) %>%
+  mutate(Recipient_Donor=rep(names(ddepend_lmres_list), each=2),
+         Source=rep(c("Intercept", "scAbundance"), times=nrow(.)/2))
+
+ddepend_lmres <- 
+  ddepend_lmres %>%
+  separate(Recipient_Donor, into=c("Recipient", "Donor"), sep="_") %>%
+  filter(Source=="scAbundance") %>%
+  mutate(SignDD=ifelse(Estimate>0, "PositiveDD", "NegativeDD"))
+
+head(ddepend_lmres) #display data sheet
+```
+
+## Calculate mean interaction strength and interaction temporal variability in the controls
+
+```{r calc population and IS instability}
+# calculate smap coef statistics
+
+all_multsmap_coefs_smrz <- 
+  all_multsmap_coefs %>%
+  group_by(Treatment, Recipient, Donor, r_d, Recipient_Donor, Year, Tank) %>% #summarise per year per tank
+  summarise(smap_coef_mean=mean(smap_coef, na.rm=TRUE), 
+            smap_coef_SD=sd(smap_coef, na.rm=TRUE)) %>% 
+  group_by(Treatment, Recipient, Donor, r_d, Recipient_Donor) %>% #summarise over years and tanks
+  summarise(smap_coef_mean=mean(abs(smap_coef_mean), na.rm=TRUE), 
+            smap_coef_SD=mean(smap_coef_SD, na.rm=TRUE))
+
+# remove unnecessary rows
+
+all_multsmap_coefs_smrz_intersp <- 
+  all_multsmap_coefs_smrz %>%
+  separate(Donor, into=c("Donor_", "delay"), sep="_", remove=FALSE) %>% 
+  filter(Recipient!=Donor_ & r_d!="c_0") %>% #omit intraspecific effects and intercept
+  select(-Donor_, - delay)%>% #omit unnecessary columns
+  ungroup(.)
+
+# calculate diffs in smap coefs (unnecessary for analysis but used to compile data)
+
+smapcoef_TrEff <- #difference in smap coefs between the pesticide treatments and the controls 
+  all_multsmap_coefs_smrz_intersp %>%
+  ungroup(.) %>%
+  select(-r_d, -smap_coef_SD) %>%
+  spread(value=smap_coef_mean, key=Treatment) %>% 
+  mutate(Fipro_Cont=Fipro-Cont, 
+         Pent_Cont=Pent-Cont,
+         Joint_Cont=Joint-Cont) %>%
+  select(-Cont, -Fipro, -Pent, -Joint) %>% 
+  gather(key=Treatment_Cont, value=IS_response, -(1:3)) %>% 
+  mutate(Treatment_Cont=factor(Treatment_Cont, levels=c("Fipro_Cont", "Pent_Cont", "Joint_Cont"))) %>%
+  left_join(., select(filter(all_multsmap_coefs_smrz_intersp, Treatment=="Cont"), Recipient_Donor, smap_coef_SD, smap_coef_mean)) 
+
+# assemble (merge) data
+
+smapcoef_TrEff <- 
+  smapcoef_TrEff %>%
+  left_join(., Abundance_TrEff) %>%
+  rename(R_Abundance_response_nRR_0.1=Abundance_response_nRR_0.1) %>%
+  left_join(., Abundance_TrEff, by=c("Donor"="Recipient", "Year"="Year", "Treatment_Cont"="Treatment_Cont")) %>%
+  rename(D_Abundance_response_nRR_0.1=Abundance_response_nRR_0.1)
+
+smapcoef_TrEff_SignDD <- left_join(smapcoef_TrEff, ddepend_lmres)
+
+smapcoef_TrEff_SignDD <- 
+  smapcoef_TrEff_SignDD %>% 
+  mutate(abs_R_Abundance_response_nRR_0.1=abs(R_Abundance_response_nRR_0.1), 
+         abs_D_Abundance_response_nRR_0.1=abs(D_Abundance_response_nRR_0.1), 
+         log_abs_DD=log(abs(Estimate)))
+
+# display data sheet
+
+head(as.data.frame(smapcoef_TrEff_SignDD))
+```
+
+## Likelihood ratio tests and multiple regressions
+
+```{r multiple regression, fig.width=13, fig.height=4}
+theme_set(theme_test())
+
+Group.list <- data.frame(Group=c("Phytopla1", "Roti1", "Zoopla1", "Mp1", "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Moll1"), 
+                         Function=c("Producer", "Prey", "Prey", "Producer", "Prey", 
+                                    "Prey", "Predator", "Predator", "Predator", "Prey"),
+                         No.connections=c(4, 7, 2, 5, 4, 5, 3, 1, 2, 5), #unnecessary but maybe useful for readers interested in this property
+                         No.causes=c(3, 5, 1, 3, 2, 3, 3, 1, 1, 0), #unnecessary but maybe useful for readers interested in this property
+                         No.effects=c(3, 3, 1, 3, 3, 3, 1, 0, 1, 5)) #unnecessary but maybe useful for readers interested in this property
+smapcoef_TrEff_SignDD_ <- left_join(smapcoef_TrEff_SignDD, Group.list, by=c("Recipient"="Group"))
+
+# Do likelihood ratio tests repeatedly
+
+Trt_Cont <- c("Fipro_Cont", "Pent_Cont", "Joint_Cont")
+LRT_res_list <- NULL
+for (i in Trt_Cont) {
+  LRT_res <- mixed(log(abs_R_Abundance_response_nRR_0.1+1) ~ 
+                     scale(log_abs_DD, scale=FALSE)*SignDD + scale(smap_coef_SD, scale=FALSE) + scale(smap_coef_mean, scale=FALSE) + Function + #centring is necessary for type-3-like tests
+                     (1|Recipient_Donor) + (1|Year), 
+                   subset(smapcoef_TrEff_SignDD_, Treatment_Cont==i), method="LRT", type=3, 
+                   control=lmerControl(check.conv.singular = .makeCC(action = "ignore",  tol = 1e-6)), 
+                   progress=FALSE)
+  LRT_res_list <- c(LRT_res_list, list(LRT_res))
+  ISDD_LRT_res <- as.data.frame(anova(LRT_res))
+  ISDD_LRT_res[,2] <- round(ISDD_LRT_res[,2], digits=2)
+  ISDD_LRT_res[,4] <- round(ISDD_LRT_res[,4], digits=2)
+  write.csv(ISDD_LRT_res, paste("./output/table/ISDD_LRT_", i, ".csv", sep=""))
+}
+names(LRT_res_list) <- Trt_Cont
+LRT_res_list
+
+# Display multiple regression results
+
+## Fipro
+
+Vulnerability.Ta_FC.TMB <- glmmTMB(log(abs_R_Abundance_response_nRR_0.1+1) ~ 
+                                     log_abs_DD*SignDD + smap_coef_SD + smap_coef_mean + Function + 
+                                     (1|Recipient_Donor) + (1|Year), REML=TRUE, 
+                                   subset(smapcoef_TrEff_SignDD_, Treatment_Cont=="Fipro_Cont"), 
+                                   control=glmmTMBControl(optimizer=optim,
+                                                          optArgs=list(method="BFGS")))
+p1<- plot(visreg(Vulnerability.Ta_FC.TMB, "smap_coef_mean", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Mean interaction strength", ylab="")
+p2<- plot(visreg(Vulnerability.Ta_FC.TMB, "smap_coef_SD", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Interaction temporal variability", ylab="")
+p3<- plot(visreg(Vulnerability.Ta_FC.TMB,  "log_abs_DD", by="SignDD", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="ln(Interaction density dependence)", ylab="ln(Recipient sensitivity + 1)")
+p3 <- p3 + scale_y_continuous(limits=c(-0.4, 2.1)) + 
+  theme(legend.position=c(0.5, 0.93), legend.justification="center", legend.direction="horizontal") +
+  scale_color_manual(name=NULL, labels=c("Negative IDD", "Positive IDD"), values=c("#FF4E37", "#008DFFFF")) +
+  scale_fill_manual(name=NULL, labels=c("Negative IDD", "Positive IDD"), values=alpha(c("#FF4E37", "#008DFFFF"), 0.3)) + 
+  ggtitle("Model for I vs. C")
+p4<- plot(visreg(Vulnerability.Ta_FC.TMB, "Function", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Recipient function", ylab="")
+(fig.fipro <- p3+p2+p1+p4 + plot_layout(nrow=1, guides="keep"))
+
+## Pent
+
+Vulnerability.Ta_PC.TMB <- glmmTMB(log(abs_R_Abundance_response_nRR_0.1+1) ~ 
+                                     (log_abs_DD)*SignDD + smap_coef_SD + smap_coef_mean + Function +
+                                     (1|Recipient_Donor) + (1|Year), REML=TRUE, 
+                                   subset(smapcoef_TrEff_SignDD_, Treatment_Cont=="Pent_Cont"), 
+                                   control=glmmTMBControl(optimizer=optim,
+                                                          optArgs=list(method="BFGS")))
+p1<- plot(visreg(Vulnerability.Ta_PC.TMB, "smap_coef_mean", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Mean interaction strength", ylab="")
+p2<- plot(visreg(Vulnerability.Ta_PC.TMB, "smap_coef_SD", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Interaction temporal variability", ylab="")
+p3<- plot(visreg(Vulnerability.Ta_PC.TMB,  "log_abs_DD", by="SignDD", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="ln(Interaction density dependence)", ylab="ln(Recipient sensitivity + 1)") + theme(legend.position="none") + ggtitle("Model for H vs. C")
+p4<- plot(visreg(Vulnerability.Ta_PC.TMB, "Function", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Recipient function", ylab="")
+(fig.pent <- p3+p2+p1+p4 + plot_layout(nrow=1, guides="keep"))
+
+## Joint
+
+Vulnerability.Ta_JC.TMB <- glmmTMB(log(abs_R_Abundance_response_nRR_0.1+1) ~ 
+                                     (log_abs_DD)*SignDD + smap_coef_SD + smap_coef_mean + Function +
+                                     (1|Recipient_Donor) + (1|Year), REML=TRUE, 
+                                   subset(smapcoef_TrEff_SignDD_, Treatment_Cont=="Joint_Cont"), 
+                                   control=glmmTMBControl(optimizer=optim,
+                                                          optArgs=list(method="BFGS")))
+p1<- plot(visreg(Vulnerability.Ta_JC.TMB, "smap_coef_mean", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Mean interaction strength", ylab="")
+p2<- plot(visreg(Vulnerability.Ta_JC.TMB, "smap_coef_SD", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Interaction temporal variability", ylab="")
+p3<- plot(visreg(Vulnerability.Ta_JC.TMB,  "log_abs_DD", by="SignDD", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="ln(Interaction density dependence)", ylab="ln(Recipient sensitivity + 1)") + theme(legend.position="none") + ggtitle("Model for I+H vs. C")
+p4<- plot(visreg(Vulnerability.Ta_JC.TMB, "Function", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
+          xlab="Recipient function", ylab="")
+(fig.joint <- p3+p2+p1+p4 + plot_layout(nrow=1, guides="keep"))
+
+```
+
+### Generate Fig. 4
+
+```{r fig assemble, fig.width=14, fig.height=9.5}
+theme_set(theme_test())
+fig5 <- (fig.fipro / fig.pent / fig.joint) + plot_annotation(tag_levels="a") & 
+  theme(plot.tag.position=c(0.06, 0.95), plot.tag=element_text(face="bold"), plot.margin=unit(c(8, 1.5, 5.5, 8), "pt"))
+#windows(14, 9.5, rescale="fixed")
+fig5
+#ggsave("fig4.ggplot2.pdf", width=14, height=9, device=cairo_pdf, unit="in")
+```
+
+## Correlations between mean interaction strength and interaction temporal variability
+
+### Generate Fig. S4
+
+```{r IS DD, IS intrinsic variability, mean IS 2, fig.width=9, fig.height=4}
+
+p1 <- 
+  ggplot(subset(smapcoef_TrEff_SignDD, Treatment_Cont=="Fipro_Cont"), 
+         aes(x=abs(smap_coef_mean), y=smap_coef_SD)) +
+  geom_point() + geom_smooth(method="lm") + 
+  scale_y_continuous(limits=c(0, 0.15)) +
+  xlab("Mean interaction strength") + ylab("Interaction temporal variability")
+summary(lm(smap_coef_SD ~ abs(smap_coef_mean), subset(smapcoef_TrEff_SignDD, Treatment_Cont=="Fipro_Cont")))
+
+p2 <- 
+  ggplot(subset(smapcoef_TrEff_SignDD, Treatment_Cont=="Fipro_Cont"), 
+         aes(x=abs(smap_coef_mean), y=smap_coef_SD, color=SignDD)) +
+  geom_point() + geom_smooth(method="lm") + 
+  scale_y_continuous(limits=c(0, 0.15)) +
+  xlab("Mean interaction strength") + ylab("Interaction temporal variability") +
+  scale_color_discrete(name="Direction of IDD", labels=c("Negative IDD", "Positive IDD"))
+summary(lm(smap_coef_SD ~ abs(smap_coef_mean)*SignDD, subset(smapcoef_TrEff_SignDD, Treatment_Cont=="Fipro_Cont")))
+
+p1 + p2 + plot_annotation(tag_levels="a")
+#ggsave("figS4.ggplot2.pdf", width=9, height=4, device=cairo_pdf, unit="in")
+```
