@@ -1,6 +1,6 @@
 "Cause","Ph","Ro","Zo","Mp","Det","Herb","PP","PB","PS","Moll"
 "Ph",NA,-2,NA,1,0,0,NA,NA,NA,1
-"Ro",-1,NA,-2,-2,-2,NA,2,NA,NA,-1
+"Ro",-1,NA,-2,-2,-2,NA,-2,NA,NA,-1
 "Zo",NA,1,NA,2,NA,NA,NA,NA,NA,-2
 "Mp",NA,NA,NA,NA,-2,-2,NA,NA,-2,NA
 "Det",-1,NA,NA,2,NA,-2,NA,NA,NA,NA
