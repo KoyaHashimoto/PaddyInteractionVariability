@@ -150,7 +150,7 @@ lib_custom_Mp <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,8
                           c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+88, 
                           c(2,10, 13,21, 24,32, 35,43, 46,54, 57,65, 68,76, 79,87)+176), ncol=2, byrow=TRUE)
 
-num_randsamp <- 10 # 100なら、phytophilous predators xmap rotifersのoptimal lagは-2になるが、10だと+2になる
+num_randsamp <- 100 # 100なら、phytophilous predators xmap rotifersのoptimal lagは-2になるが、10だと+2になる
 ```
 
 ## Do lagged CCM repeatedly

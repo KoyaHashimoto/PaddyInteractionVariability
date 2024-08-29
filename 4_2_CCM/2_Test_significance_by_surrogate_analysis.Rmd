@@ -55,7 +55,7 @@ lib_custom_Mp <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,8
                           c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+88, 
                           c(2,10, 13,21, 24,32, 35,43, 46,54, 57,65, 68,76, 79,87)+176), ncol=2, byrow=TRUE)
 
-No.surr <- 10
+No.surr <- 1000
 No.samp <- 1 #Because only the rho values at the maximum library length are used, one time sampling is sufficient
 
 ```

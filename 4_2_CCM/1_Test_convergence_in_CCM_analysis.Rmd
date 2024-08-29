@@ -198,7 +198,7 @@ Moll1 <- subset(all_Ts, Recipient=="Moll1")
 
 ## Save best embedding dimensions and library snd set params
 
-- See "Characteristics of time series (2017-2019 composite).html"
+- See "4_1_Determine_embedding_dimensions"
 
 ```{r save E and library}
 EPh <- 5; ERo <- 6; EZo <- 6; EMp <- 5; EDet <- 4; EHerb <- 6; EPP <- 5; EPB <- 2; EPS <- 5; EMoll <- 4
@@ -213,7 +213,7 @@ lib_custom <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87),
 lib_custom_Mp <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87), #define library of macrophye
                        c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+88, 
                        c(2,10, 13,21, 24,32, 35,43, 46,54, 57,65, 68,76, 79,87)+176), ncol=2, byrow=TRUE)
-No.samp <- 3
+No.samp <- 1000
 ```
 
 ## CCM analysis
