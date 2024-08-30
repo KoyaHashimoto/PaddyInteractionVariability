@@ -2,7 +2,9 @@
 title: "Test convergence in CCM analysis (2017-2019 composite)"
 author: "Koya Hashimoto"
 date: "2024/8/23"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Test convergence in CCM analysis (2017-2019 composite)
@@ -16,11 +18,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load required packages
 
 ```{r packages}
-sessionInfo()
+sessionInfo(); #R v.3.6.3
 
-library(rEDM); packageVersion("rEDM") #0.7.5
-library(tidyr); packageVersion("tidyr")
-library(dplyr); packageVersion("dplyr")
+library(rEDM); packageVersion("rEDM") #v.0.7.5
+library(tidyr); packageVersion("tidyr") #v.1.1.2
+library(dplyr); packageVersion("dplyr") #v.1.0.2
 ```
 
 ### Data compile
@@ -213,7 +215,7 @@ lib_custom <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87),
 lib_custom_Mp <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87), #define library of macrophye
                        c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+88, 
                        c(2,10, 13,21, 24,32, 35,43, 46,54, 57,65, 68,76, 79,87)+176), ncol=2, byrow=TRUE)
-No.samp <- 1000
+No.samp <- 1000 # This takes time
 ```
 
 ## CCM analysis
@@ -305,7 +307,8 @@ for (i in 1:90){
 maxrho_mat <- matrix(c(as.vector(rbind(NA, matrix(z, ncol=9))), NA), ncol=10)
 rownames(maxrho_mat) <- c("c_Ph", "c_Ro", "c_Zo", "c_Mp", "c_Det", "c_Herb", "c_PP", "c_PB", "c_PS", "c_Moll")
 colnames(maxrho_mat) <- c("e_Ph", "e_Ro", "e_Zo", "e_Mp", "e_Det", "e_Herb", "e_PP", "e_PB", "e_PS", "e_Moll")
-t(round(maxrho_mat, digits=4))
+maxrho_mat <- t(maxrho_mat)
+round(maxrho_mat, digits=4)
 
 z <- NULL
 for (i in 1:90){
@@ -314,7 +317,8 @@ for (i in 1:90){
 conv_mat <- matrix(c(as.vector(rbind(NA, matrix(z, ncol=9))), NA), ncol=10)
 rownames(conv_mat) <- c("c_Ph", "c_Ro", "c_Zo", "c_Mp", "c_Det", "c_Herb", "c_PP", "c_PB", "c_PS", "c_Moll")
 colnames(conv_mat) <- c("e_Ph", "e_Ro", "e_Zo", "e_Mp", "e_Det", "e_Herb", "e_PP", "e_PB", "e_PS", "e_Moll")
-t(round(conv_mat, digits=4))
+conv_mat <- t(conv_mat)
+round(conv_mat, digits=4)
 
 write.csv(maxrho_mat, "../4_2_CCM/ccm_tables/maxrho_mat.csv")
 write.csv(conv_mat, "../4_2_CCM/ccm_tables/conv_mat.csv")

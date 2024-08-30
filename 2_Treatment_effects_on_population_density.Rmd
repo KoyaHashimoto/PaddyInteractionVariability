@@ -2,19 +2,10 @@
 title: "Treatment effects on population density tested by LMMs"
 author: "Koya Hashimoto"
 date: "2024/08/20"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
-
-```{r md-header, include=FALSE}
-# ---
-# title: "Treatment effects on population density tested by LMMs"
-# author: "Koya Hashimoto"
-# date: "2024/08/20"
-# output: 
-#   md_document: 
-#     variant: markdown_github
-# ---
-```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -25,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load required packages
 
 ```{r packages}
-sessionInfo() #save session information
+sessionInfo() #save session information (R version 3.6.3 (2020))
 
 library(dplyr); packageVersion("dplyr") #v.1.0.2
 library(tidyr); packageVersion("tidyr") #v.1.1.2

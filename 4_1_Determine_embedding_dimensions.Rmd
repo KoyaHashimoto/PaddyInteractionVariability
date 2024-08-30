@@ -2,19 +2,10 @@
 title: "Determine best embedding dimensions"
 author: "Koya Hashimoto"
 date: "2024/6/14"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
-
-```{r header, include=FALSE}
-# ---
-# title: "Determine best embedding dimensions"
-# author: "Koya Hashimoto"
-# date: "2024/6/14"
-# output: 
-#   md_document: 
-#     variant: markdown_github
-# ---
-```
 
 # Determine best embedding dimensions
 
@@ -27,10 +18,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load required packages
 
 ```{r package}
-sessionInfo()
+sessionInfo() #save session information (R version 3.6.3 (2020))
 library(rEDM); packageVersion("rEDM") #0.7.5
-library(tidyr); packageVersion("tidyr")
-library(dplyr); packageVersion("dplyr")
+library(tidyr); packageVersion("tidyr") #1.1.2
+library(dplyr); packageVersion("dplyr") #1.0.2
 ```
 
 ### Data compilation

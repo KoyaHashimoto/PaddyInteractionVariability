@@ -2,7 +2,9 @@
 title: "Test significance by surrogate analysis"
 author: "Koya Hashimoto"
 date: "2024/8/22"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Test significance by surrogate analysis
@@ -16,11 +18,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load required packages
 
 ```{r package}
-sessionInfo()
+sessionInfo(); #R v.3.6.3
 
-library(rEDM); packageVersion("rEDM") #0.7.5
-library(dplyr)
-library(tidyr)
+library(rEDM); packageVersion("rEDM") #v.0.7.5
+library(tidyr); packageVersion("tidyr") #v.1.1.2
+library(dplyr); packageVersion("dplyr") #v.1.0.2
 ```
 
 ### Data compilation
@@ -336,6 +338,7 @@ MCpv
 MCpv_mat <- matrix(c(as.vector(rbind(NA, matrix(MCpv, ncol=9))), NA), ncol=10)
 rownames(MCpv_mat) <- c("c_Ph", "c_Ro", "c_Zo", "c_Mp", "c_Det", "c_Herb", "c_PP", "c_PB", "c_PS", "c_Moll")
 colnames(MCpv_mat) <- c("e_Ph", "e_Ro", "e_Zo", "e_Mp", "e_Det", "e_Herb", "e_PP", "e_PB", "e_PS", "e_Moll")
-t(round(MCpv_mat, digits=4))
+MCpv_mat <- t(MCpv_mat)
+round(MCpv_mat, digits=4)
 write.csv(MCpv_mat, "../4_2_CCM/ccm_tables/MCpv_mat.csv")
 ```

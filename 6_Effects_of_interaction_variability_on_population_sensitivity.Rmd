@@ -2,7 +2,9 @@
 title: "Effects of interaction variability on population sensitivity"
 author: "Koya Hashimoto"
 date: "2024/8/20"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Effects of intereaction variability on population sensitivity tested by multiple regression approaches
@@ -254,7 +256,7 @@ fig5 <- (fig.fipro / fig.pent / fig.joint) + plot_annotation(tag_levels="a") &
   theme(plot.tag.position=c(0.06, 0.95), plot.tag=element_text(face="bold"), plot.margin=unit(c(8, 1.5, 5.5, 8), "pt"))
 #windows(14, 9.5, rescale="fixed")
 fig5
-#ggsave("fig4.ggplot2.pdf", width=14, height=9, device=cairo_pdf, unit="in")
+ggsave("./figs/fig4.ggplot2.pdf", width=14, height=9, device=cairo_pdf, unit="in")
 ```
 
 ## Correlations between mean interaction strength and interaction temporal variability
@@ -281,5 +283,5 @@ p2 <-
 summary(lm(smap_coef_SD ~ abs(smap_coef_mean)*SignDD, subset(smapcoef_TrEff_SignDD, Treatment_Cont=="Fipro_Cont")))
 
 p1 + p2 + plot_annotation(tag_levels="a")
-#ggsave("figS4.ggplot2.pdf", width=9, height=4, device=cairo_pdf, unit="in")
+ggsave("./figs/figS4.ggplot2.pdf", width=9, height=4, device=cairo_pdf, unit="in")
 ```

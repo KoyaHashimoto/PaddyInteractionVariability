@@ -2,7 +2,9 @@
 title: "Overview of S-map coefficient results"
 author: "Koya Hashimoto"
 date: "2023/10/6"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Overview of S-map coefficient results
@@ -14,14 +16,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load required packages
 
 ```{r library}
-sessionInfo()
+sessionInfo() #save session information (R version 3.6.3 (2020))
 
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(patchwork)
-library(igraph)
-library(RColorBrewer)
+library(ggplot2) #3.3.2
+library(dplyr) #1.0.2
+library(tidyr) #1.1.2
+library(patchwork) #1.1.1
+library(igraph) #1.2.6
+library(RColorBrewer) #1.1.2
 ```
 
 ### Data compilation
@@ -150,7 +152,7 @@ V(g1)$name <- c("Phytoplankton", "Rotifers", "Crustacean\nzooplankton", "Macroph
 l <- layout_in_circle(g1) #layout in circle
 
 #windows(7, 10, rescale="fixed")
-#pdf("all_networks.pdf", width=7, height=10)
+pdf("./figs/figS2.pdf", width=7, height=10)
 layout(matrix(c(1, 2, 5, 6, 3, 4, 7, 8), ncol=2, byrow=TRUE), heights=c(2.5, 1, 2.5, 1))
 #each treatment
 par(mar=c(2, 2, 2, 2), family="sans")
@@ -276,6 +278,7 @@ ggplot(anova_res, aes(y=!!as.name("Mean Sq"), x=Source, group=Recipient_Donor)) 
                                                    "Year_Week"="Census date", 
                                                    "Treatment:Year_Week"="Treatment x Census date", 
                                                    "Residuals"="Residuals"))
+ggsave("./figs/figS5.ggplot2.pdf", width=6, height=6, device=cairo_pdf, unit="in")
 
 ggplot(anova_res, aes(y=!!as.name("F value"), x=Source, group=Recipient_Donor)) + 
   geom_point() + geom_line() + scale_y_log10()

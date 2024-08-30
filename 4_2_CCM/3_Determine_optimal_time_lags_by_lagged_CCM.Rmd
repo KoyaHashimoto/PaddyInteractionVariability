@@ -2,7 +2,9 @@
 title: "Determine optimal time lags by lagged-CCM"
 author: "Koya Hashimoto"
 date: "2024/8/23"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Determine optimal time lags by lagged-CCM
@@ -16,12 +18,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load packages
 
 ```{r set-up}
-sessionInfo()
+sessionInfo(); #R v.3.6.3
 
-library(rEDM); packageVersion("rEDM") #0.7.5
-library(tidyr)
-library(dplyr)
-library(ggplot2)
+library(rEDM); packageVersion("rEDM") #v.0.7.5
+library(tidyr); packageVersion("tidyr") #v.1.1.2
+library(dplyr); packageVersion("dplyr") #v.1.0.2
+library(ggplot2); packageVersion("ggplot2") #v.3.3.2
 ```
 
 ### Data compile
@@ -150,7 +152,7 @@ lib_custom_Mp <- matrix(c(c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,8
                           c(1,10, 12,21, 23,32, 34,43, 45,54, 56,65, 67,76, 78,87)+88, 
                           c(2,10, 13,21, 24,32, 35,43, 46,54, 57,65, 68,76, 79,87)+176), ncol=2, byrow=TRUE)
 
-num_randsamp <- 100 # 100なら、phytophilous predators xmap rotifersのoptimal lagは-2になるが、10だと+2になる
+num_randsamp <- 100
 ```
 
 ## Do lagged CCM repeatedly
@@ -259,7 +261,7 @@ Optlagmat <-
   spread(key=Effect, value=Optlag) %>%
   head(n=10)
 rownames(Optlagmat) <- Optlagmat$Cause
-t(Optlagmat[,-1])
+Optlagmat <- t(Optlagmat[,-1])
 write.csv(Optlagmat, "../4_2_CCM/ccm_tables/Optlagmat.csv", row.names=FALSE)
 ```
 

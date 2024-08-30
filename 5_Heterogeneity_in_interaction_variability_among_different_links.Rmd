@@ -2,7 +2,9 @@
 title: "Heterogeneity in interaction variability among different links"
 author: "Koya Hashimoto"
 date: "2024/8/20"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Heterogeneity in interaction variability among different links
@@ -14,14 +16,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load packages
 
 ```{r library}
-sessionInfo()
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(patchwork)
-library(igraph)
-library(RColorBrewer)
-library(ggsci)
+sessionInfo() #save session information (R version 3.6.3 (2020))
+library(ggplot2); packageVersion("ggplot2") #3.3.2
+library(dplyr); packageVersion("dplyr") #1.0.2
+library(tidyr); packageVersion("tidyr") #1.1.2
+library(patchwork); packageVersion("patchwork") #1.1.1
+library(igraph); packageVersion("igraph") #1.2.6
+library(RColorBrewer); packageVersion("RColorBrewer") #1.1.2
+library(ggsci); packageVersion("ggsci") #2.9
 ```
 
 ### Data compilation
@@ -414,7 +416,7 @@ strip.labs <-
   )
 names(strip.labs) <- as.character(levels(all_multsmap_coefs$Recipient_Donor))
 
-gg1_ <- all_multsmap_coefs_intersp_ab %>% #試作2
+gg1_ <- all_multsmap_coefs_intersp_ab %>% 
   #  mutate(Recipient_Donor=factor(Recipient_Donor, levels=unite(arrange(.data=ddepend_lmres, Estimate), col="Recipient_Donor", Recipient, Donor)$Recipient_Donor)) %>%
   ggplot(aes(x=scAbundance, y=smap_coef)) + 
   facet_wrap(~Recipient_Donor, labeller=labeller(Recipient_Donor=strip.labs), ncol=8) + 
@@ -436,6 +438,5 @@ fig3.ggplot2_2 <-
   plot_annotation(tag_levels='a') & theme(plot.tag=element_text(face="bold"))
 
 plot(fig3.ggplot2_2)
-#ggsave("fig3.ggplot2__.pdf", width=14, height=12, device=cairo_pdf, unit="in")
+ggsave("./figs/fig3.ggplot2.pdf", width=14, height=12, device=cairo_pdf, unit="in")
 ```
-

@@ -2,7 +2,9 @@
 title: "Regularized S-map diagnostics"
 author: "Koya Hashimoto"
 date: "2023/8/29"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Regularized S-map diagnostics
@@ -14,11 +16,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Load required packages
 
 ```{r library}
-sessionInfo()
-library(ggplot2); packageVersion("ggplot2")
-library(dplyr); packageVersion("dplyr")
-library(tidyr); packageVersion("tidyr")
-library(patchwork); packageVersion("patchwork")
+sessionInfo() #save session information (R version 3.6.3 (2020))
+library(ggplot2); packageVersion("ggplot2") #3.3.2
+library(dplyr); packageVersion("dplyr") #1.0.2
+library(tidyr); packageVersion("tidyr") #1.1.2
+library(patchwork); packageVersion("patchwork") #1.1.1
 ```
 
 ### Load data

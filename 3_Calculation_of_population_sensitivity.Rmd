@@ -2,7 +2,9 @@
 title: "Calculation of population sensitivity"
 author: "Koya Hashimoto"
 date: "2024/6/14"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # Calculation of population sensitiity
@@ -164,5 +166,5 @@ density.boxplot_gg <-
 ```{r paper fig, fig.width=8, fig.height=7}
 #windows(8, 7, rescale="fixed")
 density.boxplot_gg / reaction.norm + plot_layout(height=c(5, 3)) + plot_annotation(tag_levels="a") & theme(plot.tag=element_text(face="bold"))
-#ggsave("fig2.ggplot2_.pdf", width=8, height=7, device=cairo_pdf, unit="in")
+ggsave("./figs/fig2.ggplot2.pdf", width=8, height=7, device=cairo_pdf, unit="in")
 ```

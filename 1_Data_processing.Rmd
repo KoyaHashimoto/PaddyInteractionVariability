@@ -2,19 +2,10 @@
 title: "Data processing"
 author: "Koya Hashimoto"
 date: "2021/01/20"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
-
-```{r header}
-# ---
-# title: "Data processing"
-# author: "Koya Hashimoto"
-# date: "2021/01/20"
-# output: 
-#   md_document: 
-#     variant: markdown_github
-# ---
-```
 
 
 ```{r setup, include=FALSE}
@@ -29,14 +20,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load packages
 
 ```{r set-up}
-sessionInfo()
+sessionInfo() #save session information (R version 3.6.3 (2020))
 
-library(dplyr); packageVersion("dplyr")
-library(tidyr); packageVersion("tidyr")
-library(RColorBrewer); packageVersion("RcolorBrewer")
-library(ggplot2); packageVersion("ggplot2")
-library(ggsci); packageVersion("ggsci")
-library(patchwork); packageVersion("patchwork")
+library(dplyr); packageVersion("dplyr") #v.1.0.2
+library(tidyr); packageVersion("tidyr") #v.1.1.2
+library(RColorBrewer); packageVersion("RcolorBrewer") #v.1.1.2
+library(ggplot2); packageVersion("ggplot2") #v.3.3.2
+library(ggsci); packageVersion("ggsci") #v.2.9
+library(patchwork); packageVersion("patchwork") #v.1.1.1
 ```
 
 ## Data compile
