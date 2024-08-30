@@ -262,6 +262,7 @@ Optlagmat <-
   head(n=10)
 rownames(Optlagmat) <- Optlagmat$Cause
 Optlagmat <- t(Optlagmat[,-1])
+Optlagmat
 write.csv(Optlagmat, "../4_2_CCM/ccm_tables/Optlagmat.csv", row.names=FALSE)
 ```
 
