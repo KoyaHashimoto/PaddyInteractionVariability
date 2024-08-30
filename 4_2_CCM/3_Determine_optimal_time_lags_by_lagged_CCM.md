@@ -296,6 +296,22 @@ Optlagmat <-
   head(n=10)
 rownames(Optlagmat) <- Optlagmat$Cause
 Optlagmat <- t(Optlagmat[,-1])
+Optlagmat
+```
+
+    ##      Ph Ro Zo Mp Det Herb PP PB PS Moll
+    ## Ph   NA -1 NA NA  -1   NA -2  2 NA   NA
+    ## Ro   -2 NA  1 NA  NA    0 -2  2 NA    2
+    ## Zo   NA -2 NA NA  NA    2  2  2  2   NA
+    ## Mp    1 -2  2 NA   2   -1 -1  2  2    1
+    ## Det   0 -2 NA -2  NA    2 NA NA NA   NA
+    ## Herb  0 NA NA -2  -2   NA  2  2 NA   NA
+    ## PP   NA -2 NA NA  NA   NA NA NA NA   NA
+    ## PB   NA NA NA NA  NA   NA NA NA NA   NA
+    ## PS   NA NA NA -2  NA   NA NA  1 NA   NA
+    ## Moll  1 -1 -2 NA  NA    0  1 -2 -1   NA
+
+``` r
 write.csv(Optlagmat, "../4_2_CCM/ccm_tables/Optlagmat.csv", row.names=FALSE)
 ```
 
