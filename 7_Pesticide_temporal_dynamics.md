@@ -21,7 +21,7 @@ FW171819_$Conc[which(FW171819_$Conc==0)] <- 0.001 #substitute zero by the lower 
 PS171819_$Conc[which(PS171819_$Conc==0)] <- 0.1 #substitute zero by the lower limit finite value
 FS171819_$Conc[which(FS171819_$Conc==0)] <- 0.1 #substitute zero by the lower limit finite value
 
-pdf("./figs/figS1.pdf", width=12, height=7)
+#pdf("./figs/figS1.pdf", width=12, height=7)
 par(mfcol=c(2, 2), las=1, family="sans")
 plot(log10(Conc) ~ Week2, subset(FW171819_, Tank=="Fipro1"), pch=16, type="o", ylim=c(-3.2, 1.5), 
      xaxt="n", yaxt="n", xlab="", ylab="Water conc. of the insecticide (ug/L)")
@@ -90,8 +90,13 @@ legend("topright", bty="n",
        legend=c("Herbicide alone", "Insecticide+Herbicide"), 
        pch=c(16, 1), lty=c(1, 2))
 legend("topleft", xpd=NA, legend="d", x.intersp=-1, y.intersp=-3, bty="n", text.font=2, cex=1.2)
+```
+
+![](7_Pesticide_temporal_dynamics_files/figure-markdown_github/fig-1.png)
+
+``` r
 dev.off()
 ```
 
-    ## png 
-    ##   2
+    ## null device 
+    ##           1

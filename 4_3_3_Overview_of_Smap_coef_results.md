@@ -223,7 +223,7 @@ V(g1)$name <- c("Phytoplankton", "Rotifers", "Crustacean\nzooplankton", "Macroph
 l <- layout_in_circle(g1) #layout in circle
 
 #windows(7, 10, rescale="fixed")
-pdf("./figs/figS2.pdf", width=7, height=10)
+#pdf("./figs/figS2.pdf", width=7, height=10)
 layout(matrix(c(1, 2, 5, 6, 3, 4, 7, 8), ncol=2, byrow=TRUE), heights=c(2.5, 1, 2.5, 1))
 #each treatment
 par(mar=c(2, 2, 2, 2), family="sans")
@@ -318,11 +318,16 @@ for (i in 1:4) {
   legend("topleft", legend=c("c", "d", "g", "h")[i], 
          bty="n", xpd=NA, x.intersp=-1.2, y.intersp=-2, cex=1.2, text.font=2)
 }
+```
+
+![](4_3_3_Overview_of_Smap_coef_results_files/figure-markdown_github/suppl-1.png)
+
+``` r
 dev.off()
 ```
 
-    ## png 
-    ##   2
+    ## null device 
+    ##           1
 
 ## Source of variation in the S-map coefs (Fig. S5)
 
