@@ -1,5 +1,7 @@
 # R codes for Hashimoto et al. "Multifaceted effects of variable biotic interactions on population stability in complex interaction webs"
 
+[![DOI](https://zenodo.org/badge/792975184.svg)](https://zenodo.org/badge/latestdoi/792975184)
+
 This repository assembles raw data csv files, markdown reports with source codes of R language, tables and figures for Hashimoto et al. "Multifaceted effects of variable biotic interactions on population stability in complex interaction webs". Readers may reproduce the results of the manuscript by running the source codes step-by-step.
 
 ### Contents of markdown reports
