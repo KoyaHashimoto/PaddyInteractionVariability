@@ -24,26 +24,23 @@ sessionInfo() #save session information (R version 3.6.3 (2020))
     ## attached base packages:
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
+    ## other attached packages:
+    ## [1] rmarkdown_2.5      patchwork_1.1.1    ggsci_2.9          ggplot2_3.3.2     
+    ## [5] RColorBrewer_1.1-2 tidyr_1.1.2        dplyr_1.0.2       
+    ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] compiler_3.6.3  magrittr_2.0.3  fastmap_1.1.0   cli_3.4.1      
-    ##  [5] tools_3.6.3     htmltools_0.5.2 rstudioapi_0.11 yaml_2.2.1     
-    ##  [9] stringi_1.4.6   rmarkdown_2.5   knitr_1.30      stringr_1.4.0  
-    ## [13] xfun_0.19       digest_0.6.27   rlang_1.1.0     evaluate_0.14
+    ##  [1] pillar_1.4.6     compiler_3.6.3   tools_3.6.3      digest_0.6.27    evaluate_0.14   
+    ##  [6] lifecycle_1.0.3  tibble_3.0.4     gtable_0.3.0     pkgconfig_2.0.3  rlang_1.1.0     
+    ## [11] cli_3.4.1        rstudioapi_0.11  yaml_2.2.1       xfun_0.19        fastmap_1.1.0   
+    ## [16] stringr_1.4.0    withr_2.5.0      knitr_1.30       generics_0.1.0   vctrs_0.6.1     
+    ## [21] grid_3.6.3       tidyselect_1.1.0 glue_1.4.2       R6_2.5.0         fansi_1.0.3     
+    ## [26] purrr_0.3.4      farver_2.0.3     magrittr_2.0.3   scales_1.1.1     ellipsis_0.3.2  
+    ## [31] htmltools_0.5.2  colorspace_2.0-3 labeling_0.4.2   utf8_1.1.4       stringi_1.4.6   
+    ## [36] munsell_0.5.0    crayon_1.3.4
 
 ``` r
 library(dplyr); packageVersion("dplyr") #v.1.0.2
 ```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
 
     ## [1] '1.0.2'
 
@@ -124,8 +121,8 @@ Phytopla <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Roti <- 
@@ -136,8 +133,8 @@ Roti <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 #Miki Hirao counted all individuals in 1L sample, whereas Ji Cai took 1/10 subsample from 500mL sample and counted individuals in the 1/10 subsample
@@ -149,8 +146,8 @@ ZooplaCr <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Mp <- 
@@ -162,9 +159,9 @@ Mp <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week', 'SubPlot' (override
-    ## with `.groups` argument)`summarise()` regrouping output by 'Year', 'Tank',
-    ## 'Week' (override with `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week', 'SubPlot' (override with
+    ## `.groups` argument)`summarise()` regrouping output by 'Year', 'Tank', 'Week' (override
+    ## with `.groups` argument)
 
 ``` r
 Det <- 
@@ -175,8 +172,8 @@ Det <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Herb <- 
@@ -187,8 +184,8 @@ Herb <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Pred <- 
@@ -199,8 +196,8 @@ Pred <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Pred.P <- 
@@ -211,8 +208,8 @@ Pred.P <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Pred.B <-   AnimalData %>%
@@ -222,8 +219,8 @@ Pred.B <-   AnimalData %>%
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Pred.S <-   AnimalData %>%
@@ -233,8 +230,8 @@ Pred.S <-   AnimalData %>%
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Pred.C <-   AnimalData %>%
@@ -244,8 +241,8 @@ Pred.C <-   AnimalData %>%
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Mollusca <- 
@@ -256,8 +253,8 @@ Mollusca <-
   ungroup(.) %>% filter(Week>1)
 ```
 
-    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Year', 'Tank', 'Week' (override with `.groups`
+    ## argument)
 
 ``` r
 Commulist <- list(Phytopla, Roti, ZooplaCr, Mp, Det, Herb, Pred.P, Pred.B, Pred.S, Pred.C, Mollusca)
@@ -624,7 +621,7 @@ g_Aball <- ggplot(Abundance.gathered_mod, aes(x=Time2, y=scAbundance)) +
   scale_color_manual(values=(pal_d3(palette="category10")(10))[c(5:9, 1:4, 10)])
 ```
 
-### Fig. S3a
+### Fig. S2a
 
 ``` r
 #windows(12, 7.5, rescale="fixed")

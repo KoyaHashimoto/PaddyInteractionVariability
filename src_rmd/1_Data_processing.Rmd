@@ -300,7 +300,7 @@ g_Aball <- ggplot(Abundance.gathered_mod, aes(x=Time2, y=scAbundance)) +
   scale_color_manual(values=(pal_d3(palette="category10")(10))[c(5:9, 1:4, 10)])
 ```
 
-### Fig. S3a
+### Fig. S2a
 
 ```{r fig, fig.width=12, fig.height=7.5}
 #windows(12, 7.5, rescale="fixed")

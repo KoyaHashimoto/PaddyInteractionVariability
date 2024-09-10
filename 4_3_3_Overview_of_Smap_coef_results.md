@@ -13,61 +13,49 @@ sessionInfo() #save session information (R version 3.6.3 (2020))
     ## Matrix products: default
     ## 
     ## locale:
-    ## [1] LC_COLLATE=Japanese_Japan.932  LC_CTYPE=Japanese_Japan.932   
-    ## [3] LC_MONETARY=Japanese_Japan.932 LC_NUMERIC=C                  
+    ## [1] LC_COLLATE=Japanese_Japan.932 
+    ## [2] LC_CTYPE=Japanese_Japan.932   
+    ## [3] LC_MONETARY=Japanese_Japan.932
+    ## [4] LC_NUMERIC=C                  
     ## [5] LC_TIME=Japanese_Japan.932    
     ## 
     ## attached base packages:
-    ## [1] stats     graphics  grDevices utils     datasets  methods   base     
+    ## [1] stats     graphics  grDevices utils    
+    ## [5] datasets  methods   base     
+    ## 
+    ## other attached packages:
+    ## [1] igraph_1.2.6       rmarkdown_2.5     
+    ## [3] patchwork_1.1.1    ggsci_2.9         
+    ## [5] ggplot2_3.3.2      RColorBrewer_1.1-2
+    ## [7] tidyr_1.1.2        dplyr_1.0.2       
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] compiler_3.6.3  magrittr_2.0.3  fastmap_1.1.0   cli_3.4.1      
-    ##  [5] tools_3.6.3     htmltools_0.5.2 rstudioapi_0.11 yaml_2.2.1     
-    ##  [9] stringi_1.4.6   rmarkdown_2.5   knitr_1.30      stringr_1.4.0  
-    ## [13] xfun_0.19       digest_0.6.27   rlang_1.1.0     evaluate_0.14
+    ##  [1] pillar_1.4.6     compiler_3.6.3  
+    ##  [3] tools_3.6.3      digest_0.6.27   
+    ##  [5] evaluate_0.14    lifecycle_1.0.3 
+    ##  [7] tibble_3.0.4     gtable_0.3.0    
+    ##  [9] pkgconfig_2.0.3  rlang_1.1.0     
+    ## [11] cli_3.4.1        rstudioapi_0.11 
+    ## [13] yaml_2.2.1       xfun_0.19       
+    ## [15] fastmap_1.1.0    stringr_1.4.0   
+    ## [17] withr_2.5.0      knitr_1.30      
+    ## [19] generics_0.1.0   vctrs_0.6.1     
+    ## [21] grid_3.6.3       tidyselect_1.1.0
+    ## [23] glue_1.4.2       R6_2.5.0        
+    ## [25] fansi_1.0.3      purrr_0.3.4     
+    ## [27] farver_2.0.3     magrittr_2.0.3  
+    ## [29] scales_1.1.1     ellipsis_0.3.2  
+    ## [31] htmltools_0.5.2  colorspace_2.0-3
+    ## [33] labeling_0.4.2   utf8_1.1.4      
+    ## [35] stringi_1.4.6    munsell_0.5.0   
+    ## [37] crayon_1.3.4
 
 ``` r
 library(ggplot2) #3.3.2
 library(dplyr) #1.0.2
-```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
 library(tidyr) #1.1.2
 library(patchwork) #1.1.1
 library(igraph) #1.2.6
-```
-
-    ## 
-    ## Attaching package: 'igraph'
-
-    ## The following object is masked from 'package:tidyr':
-    ## 
-    ##     crossing
-
-    ## The following objects are masked from 'package:dplyr':
-    ## 
-    ##     as_data_frame, groups, union
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     decompose, spectrum
-
-    ## The following object is masked from 'package:base':
-    ## 
-    ##     union
-
-``` r
 library(RColorBrewer) #1.1.2
 ```
 
@@ -78,13 +66,20 @@ all_multsmap_coefs <- read.csv("./processed_data/all_regulsmap_coefs240123.csv")
 head(all_multsmap_coefs)
 ```
 
-    ##   Treatment  Tank Week Year r_d smap_coef Recipient     Donor
-    ## 1      Cont Cont1    2 2017 c_1        NA Phytopla1 Phytopla1
-    ## 2      Cont Cont1    4 2017 c_1 -1.139396 Phytopla1 Phytopla1
-    ## 3      Cont Cont1    6 2017 c_1 -1.127893 Phytopla1 Phytopla1
-    ## 4      Cont Cont1    8 2017 c_1 -1.101508 Phytopla1 Phytopla1
-    ## 5      Cont Cont1   10 2017 c_1 -1.134545 Phytopla1 Phytopla1
-    ## 6      Cont Cont1   12 2017 c_1 -1.154388 Phytopla1 Phytopla1
+    ##   Treatment  Tank Week Year r_d smap_coef
+    ## 1      Cont Cont1    2 2017 c_1        NA
+    ## 2      Cont Cont1    4 2017 c_1 -1.139396
+    ## 3      Cont Cont1    6 2017 c_1 -1.127893
+    ## 4      Cont Cont1    8 2017 c_1 -1.101508
+    ## 5      Cont Cont1   10 2017 c_1 -1.134545
+    ## 6      Cont Cont1   12 2017 c_1 -1.154388
+    ##   Recipient     Donor
+    ## 1 Phytopla1 Phytopla1
+    ## 2 Phytopla1 Phytopla1
+    ## 3 Phytopla1 Phytopla1
+    ## 4 Phytopla1 Phytopla1
+    ## 5 Phytopla1 Phytopla1
+    ## 6 Phytopla1 Phytopla1
 
 ``` r
 all_multsmap_coefs$Recipient <- 
@@ -116,10 +111,12 @@ all_multsmap_coefs_smrz <-
   summarise(smap_coef=mean(smap_coef, na.rm=TRUE))
 ```
 
-    ## `summarise()` regrouping output by 'Treatment', 'Recipient', 'Donor', 'r_d',
-    ## 'Recipient_Donor', 'Year' (override with `.groups` argument)`summarise()`
-    ## regrouping output by 'Treatment', 'Recipient', 'Donor', 'r_d' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by
+    ## 'Treatment', 'Recipient', 'Donor', 'r_d',
+    ## 'Recipient_Donor', 'Year' (override with
+    ## `.groups` argument)`summarise()` regrouping
+    ## output by 'Treatment', 'Recipient', 'Donor',
+    ## 'r_d' (override with `.groups` argument)
 
 ``` r
 all_multsmap_coefs_smrz_intersp <- 
@@ -129,8 +126,10 @@ all_multsmap_coefs_smrz_intersp <-
   select(-Donor_, - delay)
 ```
 
-    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 164 rows [1, 3,
-    ## 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 20, 21, 22, 24, 25, 26, 27, 28, ...].
+    ## Warning: Expected 2 pieces. Missing pieces filled
+    ## with `NA` in 164 rows [1, 3, 4, 5, 6, 7, 8,
+    ## 11, 12, 13, 14, 15, 20, 21, 22, 24, 25, 26, 27,
+    ## 28, ...].
 
 ``` r
 all_multsmap_coefs_smrz_intersp_abs <- 
@@ -202,7 +201,7 @@ for (i in c("Cont", "Fipro", "Pent", "Joint")){
 
 ![](4_3_3_Overview_of_Smap_coef_results_files/figure-markdown_github/interaction%20network-1.png)
 
-## Generate Fig. S2
+## Generate Fig. S1
 
 ``` r
 palSet1 <- brewer.pal(9, "Set1")
@@ -223,7 +222,7 @@ V(g1)$name <- c("Phytoplankton", "Rotifers", "Crustacean\nzooplankton", "Macroph
 l <- layout_in_circle(g1) #layout in circle
 
 #windows(7, 10, rescale="fixed")
-#pdf("./figs/figS2.pdf", width=7, height=10)
+#pdf("./figs/figS1.pdf", width=7, height=10)
 layout(matrix(c(1, 2, 5, 6, 3, 4, 7, 8), ncol=2, byrow=TRUE), heights=c(2.5, 1, 2.5, 1))
 #each treatment
 par(mar=c(2, 2, 2, 2), family="sans")
@@ -326,10 +325,10 @@ for (i in 1:4) {
 dev.off()
 ```
 
-    ## null device 
-    ##           1
+    ## RStudioGD 
+    ##         2
 
-## Source of variation in the S-map coefs (Fig. S5)
+## Source of variation in the S-map coefs (Fig. S4)
 
 We performed two-way ANOVA for every interaction link, examining the
 effects of treatment, census date and their interaction on S-map
@@ -370,15 +369,17 @@ ggplot(anova_res, aes(y=!!as.name("Mean Sq"), x=Source, group=Recipient_Donor)) 
 ![](4_3_3_Overview_of_Smap_coef_results_files/figure-markdown_github/smap%20coef%20source%20of%20variation-1.png)
 
 ``` r
-ggsave("./figs/figS5.ggplot2.pdf", width=6, height=6, device=cairo_pdf, unit="in")
+ggsave("./figs/figS4.ggplot2.pdf", width=6, height=6, device=cairo_pdf, unit="in")
 
 ggplot(anova_res, aes(y=!!as.name("F value"), x=Source, group=Recipient_Donor)) + 
   geom_point() + geom_line() + scale_y_log10()
 ```
 
-    ## Warning: Removed 57 rows containing missing values (geom_point).
+    ## Warning: Removed 57 rows containing missing values
+    ## (geom_point).
 
-    ## Warning: Removed 57 row(s) containing missing values (geom_path).
+    ## Warning: Removed 57 row(s) containing missing
+    ## values (geom_path).
 
 ![](4_3_3_Overview_of_Smap_coef_results_files/figure-markdown_github/smap%20coef%20source%20of%20variation-2.png)
 

@@ -130,7 +130,7 @@ for (i in c("Cont", "Fipro", "Pent", "Joint")){
 }
 ```
 
-## Generate Fig. S2
+## Generate Fig. S1
 
 ```{r suppl, fig.width=7, fig.height=10}
 
@@ -152,7 +152,7 @@ V(g1)$name <- c("Phytoplankton", "Rotifers", "Crustacean\nzooplankton", "Macroph
 l <- layout_in_circle(g1) #layout in circle
 
 #windows(7, 10, rescale="fixed")
-#pdf("./figs/figS2.pdf", width=7, height=10)
+#pdf("./figs/figS1.pdf", width=7, height=10)
 layout(matrix(c(1, 2, 5, 6, 3, 4, 7, 8), ncol=2, byrow=TRUE), heights=c(2.5, 1, 2.5, 1))
 #each treatment
 par(mar=c(2, 2, 2, 2), family="sans")
@@ -250,7 +250,7 @@ for (i in 1:4) {
 dev.off()
 ```
 
-## Source of variation in the S-map coefs (Fig. S5) 
+## Source of variation in the S-map coefs (Fig. S4) 
 
 We performed two-way ANOVA for every interaction link, examining the effects of treatment, census date and their interaction on S-map coefficient values, to confirm whether the temporal fluctuations of the interaction effect were consistent among replicates. The mean squares of residuals are unbiased estimates of the variance of various noises including differences in individual replicates. If these values are small relative to those of census dates or treatments, temporal fluctuations of s-map coefs should be considered as relatively consistent among replicates.
 
@@ -278,7 +278,7 @@ ggplot(anova_res, aes(y=!!as.name("Mean Sq"), x=Source, group=Recipient_Donor)) 
                                                    "Year_Week"="Census date", 
                                                    "Treatment:Year_Week"="Treatment x Census date", 
                                                    "Residuals"="Residuals"))
-ggsave("./figs/figS5.ggplot2.pdf", width=6, height=6, device=cairo_pdf, unit="in")
+ggsave("./figs/figS4.ggplot2.pdf", width=6, height=6, device=cairo_pdf, unit="in")
 
 ggplot(anova_res, aes(y=!!as.name("F value"), x=Source, group=Recipient_Donor)) + 
   geom_point() + geom_line() + scale_y_log10()

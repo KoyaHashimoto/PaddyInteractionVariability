@@ -751,12 +751,12 @@ g_smapcoefall <- ggplot(smap_coef.gathered_mod, aes(x=Time2, y=smap_coef)) +
   scale_color_manual(values=(pal_d3(palette="category10")(10))[c(5:9, 1:4)])
 ```
 
-### Fig. S3
+### Fig. S2
 
 ```{r fig, fig.width=12, fig.height=15}
 #windows(12, 15, rescale="fixed")
 figs3 <- (g_Aball / g_smapcoefall) + plot_annotation(tag_levels='a')
 figs3
-ggsave("./figs/figS3.ggplot2.pdf", width=12, height=15, device=cairo_pdf, unit="in")
+ggsave("./figs/figS2.ggplot2.pdf", width=12, height=15, device=cairo_pdf, unit="in")
 ```
 

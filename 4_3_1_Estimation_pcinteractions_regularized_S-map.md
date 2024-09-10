@@ -20,32 +20,47 @@ sessionInfo() #save session information
     ## attached base packages:
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
+    ## other attached packages:
+    ##  [1] afex_0.28-0        emmeans_1.5.2-1    car_3.0-10         carData_3.0-4     
+    ##  [5] lme4_1.1-25        Matrix_1.2-18      ggeffects_1.2.0    visreg_2.7.0      
+    ##  [9] glmmTMB_1.0.2.1    igraph_1.2.6       rmarkdown_2.5      patchwork_1.1.1   
+    ## [13] ggsci_2.9          ggplot2_3.3.2      RColorBrewer_1.1-2 tidyr_1.1.2       
+    ## [17] dplyr_1.0.2       
+    ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] compiler_3.6.3  magrittr_2.0.3  fastmap_1.1.0   cli_3.4.1      
-    ##  [5] tools_3.6.3     htmltools_0.5.2 rstudioapi_0.11 yaml_2.2.1     
-    ##  [9] stringi_1.4.6   rmarkdown_2.5   knitr_1.30      stringr_1.4.0  
-    ## [13] xfun_0.19       digest_0.6.27   rlang_1.1.0     evaluate_0.14
+    ##  [1] nlme_3.1-150        doParallel_1.0.16   numDeriv_2016.8-1.1 tools_3.6.3        
+    ##  [5] TMB_1.7.18          utf8_1.1.4          R6_2.5.0            mgcv_1.8-33        
+    ##  [9] colorspace_2.0-3    withr_2.5.0         tidyselect_1.1.0    curl_4.3           
+    ## [13] compiler_3.6.3      cli_3.4.1           sandwich_3.0-0      labeling_0.4.2     
+    ## [17] scales_1.1.1        mvtnorm_1.1-1       stringr_1.4.0       digest_0.6.27      
+    ## [21] foreign_0.8-75      minqa_1.2.4         rio_0.5.16          pkgconfig_2.0.3    
+    ## [25] htmltools_0.5.2     fastmap_1.1.0       rlang_1.1.0         readxl_1.3.1       
+    ## [29] rstudioapi_0.11     farver_2.0.3        generics_0.1.0      zoo_1.8-8          
+    ## [33] zip_2.1.1           magrittr_2.0.3      Rcpp_1.0.11         munsell_0.5.0      
+    ## [37] fansi_1.0.3         abind_1.4-5         lifecycle_1.0.3     stringi_1.4.6      
+    ## [41] multcomp_1.4-14     yaml_2.2.1          MASS_7.3-53         plyr_1.8.6         
+    ## [45] grid_3.6.3          parallel_3.6.3      forcats_0.5.0       crayon_1.3.4       
+    ## [49] lattice_0.20-38     haven_2.3.1         splines_3.6.3       hms_0.5.3          
+    ## [53] knitr_1.30          pillar_1.4.6        boot_1.3-24         estimability_1.3   
+    ## [57] reshape2_1.4.4      codetools_0.2-16    glue_1.4.2          evaluate_0.14      
+    ## [61] data.table_1.13.2   vctrs_0.6.1         nloptr_1.2.2.2      foreach_1.5.1      
+    ## [65] cellranger_1.1.0    gtable_0.3.0        purrr_0.3.4         xfun_0.19          
+    ## [69] openxlsx_4.2.3      xtable_1.8-4        coda_0.19-4         survival_3.1-8     
+    ## [73] tibble_3.0.4        lmerTest_3.1-3      iterators_1.0.13    statmod_1.4.35     
+    ## [77] TH.data_1.0-10      ellipsis_0.3.2
 
 ``` r
 library(rEDM); packageVersion("rEDM") #0.7.5
 ```
+
+    ## If you're new to the rEDM package, please check out the tutorial:
+    ## > vignette("rEDM")
 
     ## [1] '0.7.5'
 
 ``` r
 library(dplyr); packageVersion("dplyr") #1.0.2
 ```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
 
     ## [1] '1.0.2'
 
@@ -76,15 +91,6 @@ library(ggsci); packageVersion("ggsci") #2.9
 ``` r
 library(glmnet); packageVersion("glmnet") # 4.1.6, 2022.11.28
 ```
-
-    ## Loading required package: Matrix
-
-    ## 
-    ## Attaching package: 'Matrix'
-
-    ## The following objects are masked from 'package:tidyr':
-    ## 
-    ##     expand, pack, unpack
 
     ## Loaded glmnet 4.1-6
 
@@ -1133,8 +1139,8 @@ All_smap_coef <-
   ungroup(.)
 ```
 
-    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 9800 rows [1, 2,
-    ## 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
+    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 9800 rows [1, 2, 3, 4, 5,
+    ## 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
 smap_coef.gathered_ <- 
@@ -1251,7 +1257,7 @@ g_smapcoefall <- ggplot(smap_coef.gathered_mod, aes(x=Time2, y=smap_coef)) +
   scale_color_manual(values=(pal_d3(palette="category10")(10))[c(5:9, 1:4)])
 ```
 
-### Fig. S3
+### Fig. S2
 
 ``` r
 #windows(12, 15, rescale="fixed")
@@ -1266,7 +1272,7 @@ figs3
 ![](4_3_1_Estimation_pcinteractions_regularized_S-map_files/figure-markdown_github/fig-1.png)
 
 ``` r
-ggsave("./figs/figS3.ggplot2.pdf", width=12, height=15, device=cairo_pdf, unit="in")
+ggsave("./figs/figS2.ggplot2.pdf", width=12, height=15, device=cairo_pdf, unit="in")
 ```
 
     ## Warning: Removed 30 row(s) containing missing values (geom_path).

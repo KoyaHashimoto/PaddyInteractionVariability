@@ -20,11 +20,33 @@ sessionInfo() #save session information
     ## attached base packages:
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
+    ## other attached packages:
+    ##  [1] afex_0.28-0        emmeans_1.5.2-1    car_3.0-10         carData_3.0-4     
+    ##  [5] lme4_1.1-25        Matrix_1.2-18      ggeffects_1.2.0    visreg_2.7.0      
+    ##  [9] glmmTMB_1.0.2.1    igraph_1.2.6       rmarkdown_2.5      patchwork_1.1.1   
+    ## [13] ggsci_2.9          ggplot2_3.3.2      RColorBrewer_1.1-2 tidyr_1.1.2       
+    ## [17] dplyr_1.0.2       
+    ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] compiler_3.6.3  magrittr_2.0.3  fastmap_1.1.0   cli_3.4.1      
-    ##  [5] tools_3.6.3     htmltools_0.5.2 rstudioapi_0.11 yaml_2.2.1     
-    ##  [9] stringi_1.4.6   rmarkdown_2.5   knitr_1.30      stringr_1.4.0  
-    ## [13] xfun_0.19       digest_0.6.27   rlang_1.1.0     evaluate_0.14
+    ##  [1] splines_3.6.3       statmod_1.4.35      cellranger_1.1.0    yaml_2.2.1         
+    ##  [5] numDeriv_2016.8-1.1 pillar_1.4.6        lattice_0.20-38     glue_1.4.2         
+    ##  [9] digest_0.6.27       minqa_1.2.4         colorspace_2.0-3    sandwich_3.0-0     
+    ## [13] plyr_1.8.6          htmltools_0.5.2     pkgconfig_2.0.3     haven_2.3.1        
+    ## [17] purrr_0.3.4         xtable_1.8-4        mvtnorm_1.1-1       scales_1.1.1       
+    ## [21] openxlsx_4.2.3      rio_0.5.16          tibble_3.0.4        generics_0.1.0     
+    ## [25] farver_2.0.3        ellipsis_0.3.2      TH.data_1.0-10      withr_2.5.0        
+    ## [29] TMB_1.7.18          cli_3.4.1           survival_3.1-8      magrittr_2.0.3     
+    ## [33] crayon_1.3.4        readxl_1.3.1        estimability_1.3    evaluate_0.14      
+    ## [37] fansi_1.0.3         nlme_3.1-150        MASS_7.3-53         forcats_0.5.0      
+    ## [41] foreign_0.8-75      tools_3.6.3         data.table_1.13.2   hms_0.5.3          
+    ## [45] lifecycle_1.0.3     multcomp_1.4-14     stringr_1.4.0       munsell_0.5.0      
+    ## [49] zip_2.1.1           compiler_3.6.3      rlang_1.1.0         grid_3.6.3         
+    ## [53] nloptr_1.2.2.2      rstudioapi_0.11     labeling_0.4.2      boot_1.3-24        
+    ## [57] lmerTest_3.1-3      gtable_0.3.0        codetools_0.2-16    abind_1.4-5        
+    ## [61] curl_4.3            reshape2_1.4.4      R6_2.5.0            zoo_1.8-8          
+    ## [65] knitr_1.30          fastmap_1.1.0       utf8_1.1.4          stringi_1.4.6      
+    ## [69] parallel_3.6.3      Rcpp_1.0.11         vctrs_0.6.1         tidyselect_1.1.0   
+    ## [73] xfun_0.19           coda_0.19-4
 
 ``` r
 library(ggplot2); packageVersion("ggplot2") #3.3.2
@@ -35,17 +57,6 @@ library(ggplot2); packageVersion("ggplot2") #3.3.2
 ``` r
 library(dplyr); packageVersion("dplyr") #1.0.2
 ```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
 
     ## [1] '1.0.2'
 
@@ -89,36 +100,11 @@ library(ggeffects); packageVersion("ggeffects") #1.2.0
 library(lme4); packageVersion("lme4") #1.1.25
 ```
 
-    ## Loading required package: Matrix
-
-    ## 
-    ## Attaching package: 'Matrix'
-
-    ## The following objects are masked from 'package:tidyr':
-    ## 
-    ##     expand, pack, unpack
-
     ## [1] '1.1.25'
 
 ``` r
 library(car); packageVersion("car") #3.0.10
 ```
-
-    ## Loading required package: carData
-
-    ## Registered S3 methods overwritten by 'car':
-    ##   method                          from
-    ##   influence.merMod                lme4
-    ##   cooks.distance.influence.merMod lme4
-    ##   dfbeta.influence.merMod         lme4
-    ##   dfbetas.influence.merMod        lme4
-
-    ## 
-    ## Attaching package: 'car'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     recode
 
     ## [1] '3.0.10'
 
@@ -131,25 +117,6 @@ library(emmeans); packageVersion("emmeans") #1.5.2.1
 ``` r
 library(afex); packageVersion("afex") #0.28.0
 ```
-
-    ## ************
-    ## Welcome to afex. For support visit: http://afex.singmann.science/
-
-    ## - Functions for ANOVAs: aov_car(), aov_ez(), and aov_4()
-    ## - Methods for calculating p-values with mixed(): 'KR', 'S', 'LRT', and 'PB'
-    ## - 'afex_aov' and 'mixed' objects can be passed to emmeans() for follow-up tests
-    ## - NEWS: library('emmeans') now needs to be called explicitly!
-    ## - Get and set global package options with: afex_options()
-    ## - Set orthogonal sum-to-zero contrasts globally: set_sum_contrasts()
-    ## - For example analyses see: browseVignettes("afex")
-    ## ************
-
-    ## 
-    ## Attaching package: 'afex'
-
-    ## The following object is masked from 'package:lme4':
-    ## 
-    ##     lmer
 
     ## [1] '0.28.0'
 
@@ -191,8 +158,8 @@ all_multsmap_coefs_intersp <-
   ungroup(.)
 ```
 
-    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 9800 rows [1, 2,
-    ## 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
+    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 9800 rows [1, 2, 3, 4, 5,
+    ## 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
 all_multsmap_coefs_intersp_ab <- left_join(mutate(all_multsmap_coefs_intersp, Year=as.character(Year)), all_Ts)
@@ -221,20 +188,20 @@ ddepend_lmres <-
 head(ddepend_lmres) #display data sheet
 ```
 
-    ##        Estimate   Std. Error    t value     Pr(>|t|) Recipient     Donor
-    ## 1 -0.0212262846 0.0036509319 -5.8139361 2.025812e-08      Det1       Mp1
-    ## 2 -0.0419480400 0.0049520150 -8.4709032 2.916973e-15      Det1 Phytopla1
-    ## 3 -0.0057660151 0.0024092079 -2.3933240 1.749947e-02      Det1     Roti1
-    ## 4 -0.0002354927 0.0003287232 -0.7163860 4.746326e-01     Herb1      Det1
-    ## 5 -0.0009535404 0.0003550246 -2.6858436 7.875216e-03     Herb1       Mp1
-    ## 6 -0.0001063029 0.0003216795 -0.3304621 7.414150e-01     Herb1 Phytopla1
-    ##        Source     SignDD
-    ## 1 scAbundance NegativeDD
-    ## 2 scAbundance NegativeDD
-    ## 3 scAbundance NegativeDD
-    ## 4 scAbundance NegativeDD
-    ## 5 scAbundance NegativeDD
-    ## 6 scAbundance NegativeDD
+    ##        Estimate   Std. Error    t value     Pr(>|t|) Recipient     Donor      Source
+    ## 1 -0.0212262846 0.0036509319 -5.8139361 2.025812e-08      Det1       Mp1 scAbundance
+    ## 2 -0.0419480400 0.0049520150 -8.4709032 2.916973e-15      Det1 Phytopla1 scAbundance
+    ## 3 -0.0057660151 0.0024092079 -2.3933240 1.749947e-02      Det1     Roti1 scAbundance
+    ## 4 -0.0002354927 0.0003287232 -0.7163860 4.746326e-01     Herb1      Det1 scAbundance
+    ## 5 -0.0009535404 0.0003550246 -2.6858436 7.875216e-03     Herb1       Mp1 scAbundance
+    ## 6 -0.0001063029 0.0003216795 -0.3304621 7.414150e-01     Herb1 Phytopla1 scAbundance
+    ##       SignDD
+    ## 1 NegativeDD
+    ## 2 NegativeDD
+    ## 3 NegativeDD
+    ## 4 NegativeDD
+    ## 5 NegativeDD
+    ## 6 NegativeDD
 
 ## Calculate mean interaction strength and interaction temporal variability in the controls
 
@@ -252,9 +219,8 @@ all_multsmap_coefs_smrz <-
 ```
 
     ## `summarise()` regrouping output by 'Treatment', 'Recipient', 'Donor', 'r_d',
-    ## 'Recipient_Donor', 'Year' (override with `.groups` argument)`summarise()`
-    ## regrouping output by 'Treatment', 'Recipient', 'Donor', 'r_d' (override with
-    ## `.groups` argument)
+    ## 'Recipient_Donor', 'Year' (override with `.groups` argument)`summarise()` regrouping
+    ## output by 'Treatment', 'Recipient', 'Donor', 'r_d' (override with `.groups` argument)
 
 ``` r
 # remove unnecessary rows
@@ -267,8 +233,8 @@ all_multsmap_coefs_smrz_intersp <-
   ungroup(.)
 ```
 
-    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 164 rows [1, 3,
-    ## 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 20, 21, 22, 24, 25, 26, 27, 28, ...].
+    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 164 rows [1, 3, 4, 5, 6, 7,
+    ## 8, 11, 12, 13, 14, 15, 20, 21, 22, 24, 25, 26, 27, 28, ...].
 
 ``` r
 # calculate diffs in smap coefs (unnecessary for analysis but used to compile data)
@@ -320,41 +286,34 @@ smapcoef_TrEff_SignDD <-
 head(as.data.frame(smapcoef_TrEff_SignDD))
 ```
 
-    ##   Recipient Donor Recipient_Donor Treatment_Cont  IS_response smap_coef_SD
-    ## 1 Phytopla1 Roti1 Phytopla1_Roti1     Fipro_Cont -0.006422403   0.06765366
-    ## 2 Phytopla1 Roti1 Phytopla1_Roti1     Fipro_Cont -0.006422403   0.06765366
-    ## 3 Phytopla1 Roti1 Phytopla1_Roti1     Fipro_Cont -0.006422403   0.06765366
-    ## 4 Phytopla1  Det1  Phytopla1_Det1     Fipro_Cont -0.030756020   0.08478359
-    ## 5 Phytopla1  Det1  Phytopla1_Det1     Fipro_Cont -0.030756020   0.08478359
-    ## 6 Phytopla1  Det1  Phytopla1_Det1     Fipro_Cont -0.030756020   0.08478359
-    ##   smap_coef_mean Year R_Abundance_response_nRR_0.1
-    ## 1     0.03356245 2017                   0.16204186
-    ## 2     0.03356245 2018                   0.06312511
-    ## 3     0.03356245 2019                   2.72402931
-    ## 4     0.16869603 2017                   0.16204186
-    ## 5     0.16869603 2018                   0.06312511
-    ## 6     0.16869603 2019                   2.72402931
-    ##   abs_Abundance_response_nRR_0.1.x D_Abundance_response_nRR_0.1
-    ## 1                       0.16204186                    0.3195754
-    ## 2                       0.06312511                   -0.5466622
-    ## 3                       2.72402931                   -0.6312718
-    ## 4                       0.16204186                   -0.7515908
-    ## 5                       0.06312511                   -0.3493756
-    ## 6                       2.72402931                   -0.3972443
-    ##   abs_Abundance_response_nRR_0.1.y   Estimate  Std. Error   t value
-    ## 1                        0.3195754 0.06052547 0.005231589 11.569233
-    ## 2                        0.5466622 0.06052547 0.005231589 11.569233
-    ## 3                        0.6312718 0.06052547 0.005231589 11.569233
-    ## 4                        0.7515908 0.02543747 0.007142959  3.561195
-    ## 5                        0.3493756 0.02543747 0.007142959  3.561195
-    ## 6                        0.3972443 0.02543747 0.007142959  3.561195
-    ##       Pr(>|t|)      Source     SignDD abs_R_Abundance_response_nRR_0.1
-    ## 1 2.323623e-24 scAbundance PositiveDD                       0.16204186
-    ## 2 2.323623e-24 scAbundance PositiveDD                       0.06312511
-    ## 3 2.323623e-24 scAbundance PositiveDD                       2.72402931
-    ## 4 4.549211e-04 scAbundance PositiveDD                       0.16204186
-    ## 5 4.549211e-04 scAbundance PositiveDD                       0.06312511
-    ## 6 4.549211e-04 scAbundance PositiveDD                       2.72402931
+    ##   Recipient Donor Recipient_Donor Treatment_Cont  IS_response smap_coef_SD smap_coef_mean
+    ## 1 Phytopla1 Roti1 Phytopla1_Roti1     Fipro_Cont -0.006422403   0.06765366     0.03356245
+    ## 2 Phytopla1 Roti1 Phytopla1_Roti1     Fipro_Cont -0.006422403   0.06765366     0.03356245
+    ## 3 Phytopla1 Roti1 Phytopla1_Roti1     Fipro_Cont -0.006422403   0.06765366     0.03356245
+    ## 4 Phytopla1  Det1  Phytopla1_Det1     Fipro_Cont -0.030756020   0.08478359     0.16869603
+    ## 5 Phytopla1  Det1  Phytopla1_Det1     Fipro_Cont -0.030756020   0.08478359     0.16869603
+    ## 6 Phytopla1  Det1  Phytopla1_Det1     Fipro_Cont -0.030756020   0.08478359     0.16869603
+    ##   Year R_Abundance_response_nRR_0.1 abs_Abundance_response_nRR_0.1.x
+    ## 1 2017                   0.16204186                       0.16204186
+    ## 2 2018                   0.06312511                       0.06312511
+    ## 3 2019                   2.72402931                       2.72402931
+    ## 4 2017                   0.16204186                       0.16204186
+    ## 5 2018                   0.06312511                       0.06312511
+    ## 6 2019                   2.72402931                       2.72402931
+    ##   D_Abundance_response_nRR_0.1 abs_Abundance_response_nRR_0.1.y   Estimate  Std. Error
+    ## 1                    0.3195754                        0.3195754 0.06052547 0.005231589
+    ## 2                   -0.5466622                        0.5466622 0.06052547 0.005231589
+    ## 3                   -0.6312718                        0.6312718 0.06052547 0.005231589
+    ## 4                   -0.7515908                        0.7515908 0.02543747 0.007142959
+    ## 5                   -0.3493756                        0.3493756 0.02543747 0.007142959
+    ## 6                   -0.3972443                        0.3972443 0.02543747 0.007142959
+    ##     t value     Pr(>|t|)      Source     SignDD abs_R_Abundance_response_nRR_0.1
+    ## 1 11.569233 2.323623e-24 scAbundance PositiveDD                       0.16204186
+    ## 2 11.569233 2.323623e-24 scAbundance PositiveDD                       0.06312511
+    ## 3 11.569233 2.323623e-24 scAbundance PositiveDD                       2.72402931
+    ## 4  3.561195 4.549211e-04 scAbundance PositiveDD                       0.16204186
+    ## 5  3.561195 4.549211e-04 scAbundance PositiveDD                       0.06312511
+    ## 6  3.561195 4.549211e-04 scAbundance PositiveDD                       2.72402931
     ##   abs_D_Abundance_response_nRR_0.1 log_abs_DD
     ## 1                        0.3195754  -2.804691
     ## 2                        0.5466622  -2.804691
@@ -538,11 +497,11 @@ p3 <- p3 + scale_y_continuous(limits=c(-0.4, 2.1)) +
   ggtitle("Model for I vs. C")
 ```
 
-    ## Scale for 'colour' is already present. Adding another scale for 'colour',
-    ## which will replace the existing scale.
+    ## Scale for 'colour' is already present. Adding another scale for 'colour', which will
+    ## replace the existing scale.
 
-    ## Scale for 'fill' is already present. Adding another scale for 'fill', which
-    ## will replace the existing scale.
+    ## Scale for 'fill' is already present. Adding another scale for 'fill', which will
+    ## replace the existing scale.
 
 ``` r
 p4<- plot(visreg(Vulnerability.Ta_FC.TMB, "Function", re.form=NA, plot=FALSE), band=TRUE, partial=TRUE, gg=TRUE, overlay=TRUE, 
@@ -719,7 +678,7 @@ ggsave("./figs/fig4.ggplot2.pdf", width=14, height=9, device=cairo_pdf, unit="in
 
 ## Correlations between mean interaction strength and interaction temporal variability
 
-### Generate Fig. S4
+### Generate Fig. S3
 
 ``` r
 p1 <- 
@@ -794,7 +753,7 @@ p1 + p2 + plot_annotation(tag_levels="a")
 ![](6_Effects_of_interaction_variability_on_population_sensitivity_files/figure-markdown_github/IS%20DD,%20IS%20intrinsic%20variability,%20mean%20IS%202-1.png)
 
 ``` r
-ggsave("./figs/figS4.ggplot2.pdf", width=9, height=4, device=cairo_pdf, unit="in")
+ggsave("./figs/figS3.ggplot2.pdf", width=9, height=4, device=cairo_pdf, unit="in")
 ```
 
     ## `geom_smooth()` using formula 'y ~ x'

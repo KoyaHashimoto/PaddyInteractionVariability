@@ -261,7 +261,7 @@ ggsave("./figs/fig4.ggplot2.pdf", width=14, height=9, device=cairo_pdf, unit="in
 
 ## Correlations between mean interaction strength and interaction temporal variability
 
-### Generate Fig. S4
+### Generate Fig. S3
 
 ```{r IS DD, IS intrinsic variability, mean IS 2, fig.width=9, fig.height=4}
 
@@ -283,5 +283,5 @@ p2 <-
 summary(lm(smap_coef_SD ~ abs(smap_coef_mean)*SignDD, subset(smapcoef_TrEff_SignDD, Treatment_Cont=="Fipro_Cont")))
 
 p1 + p2 + plot_annotation(tag_levels="a")
-ggsave("./figs/figS4.ggplot2.pdf", width=9, height=4, device=cairo_pdf, unit="in")
+ggsave("./figs/figS3.ggplot2.pdf", width=9, height=4, device=cairo_pdf, unit="in")
 ```
