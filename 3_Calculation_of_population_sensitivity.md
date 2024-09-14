@@ -231,6 +231,21 @@ lab <- data.frame(lab="*",
                                levels=c("Phytopla1", "Roti1", "Zoopla1", "Mp1", 
                                         "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Moll1")))
 
+pval <- data.frame(lab=c("0.62", "0.92", "0.02", 
+                         "0.62", "0.97", "0.78", 
+                         "0.65", "0.33", "0.95", 
+                         "0.98", "0.02", "0.0004", 
+                         "0.46", "0.82", "0.84", 
+                         "0.86", "0.14", "0.0007", 
+                         "0.0001", "0.12", "0.0001", 
+                         "<0.0001", "0.99", "<0.0001", 
+                         "0.44", "0.91", "0.99", 
+                         "0.49", "0.96", "0.003"), 
+                  Recipient=factor(rep(c("Phytopla1", "Roti1", "Zoopla1", "Mp1", 
+                                     "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Moll1"), each=3), 
+                                   levels=c("Phytopla1", "Roti1", "Zoopla1", "Mp1", 
+                                            "Det1", "Herb1", "Pred.P1", "Pred.B1", "Pred.S1", "Moll1")))
+
 palSet1 <- brewer.pal(9, "Set1")
 
 
@@ -244,7 +259,8 @@ density.boxplot_gg <-
   scale_x_discrete(labels=c("C", "I", "H", "I+H")) +
   theme_custom() + #theme
   theme(strip.background=element_blank(), legend.position="none") +
-  geom_text(data=lab, aes(label=lab), x=c(4, 3, 4, 4, 2, 4, 2, 4, 4), y=2.5, size=10) +
+  geom_text(data=lab, aes(label=lab), x=c(4, 3, 4, 4, 2, 4, 2, 4, 4), y=2.3, size=10) +
+  geom_text(data=pval, aes(label=lab), x=rep(2:4, times=10), y=3.5, size=2.2) +
   labs(y="Standardized density") #軸ラベル
 ```
 
