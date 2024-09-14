@@ -20,11 +20,19 @@ sessionInfo() #save session information (R version 3.6.3 (2020))
     ## attached base packages:
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
+    ## other attached packages:
+    ## [1] rmarkdown_2.5      ggsci_2.9          patchwork_1.1.1    tidyr_1.1.2       
+    ## [5] dplyr_1.0.2        ggplot2_3.3.2      RColorBrewer_1.1-2
+    ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] compiler_3.6.3  magrittr_2.0.3  fastmap_1.1.0   cli_3.4.1      
-    ##  [5] tools_3.6.3     htmltools_0.5.2 rstudioapi_0.11 yaml_2.2.1     
-    ##  [9] stringi_1.4.6   rmarkdown_2.5   knitr_1.30      stringr_1.4.0  
-    ## [13] xfun_0.19       digest_0.6.27   rlang_1.1.0     evaluate_0.14
+    ##  [1] pillar_1.4.6     compiler_3.6.3   tools_3.6.3      digest_0.6.27    evaluate_0.14   
+    ##  [6] lifecycle_1.0.3  tibble_3.0.4     gtable_0.3.0     pkgconfig_2.0.3  rlang_1.1.0     
+    ## [11] cli_3.4.1        rstudioapi_0.11  yaml_2.2.1       xfun_0.19        fastmap_1.1.0   
+    ## [16] stringr_1.4.0    withr_2.5.0      knitr_1.30       generics_0.1.0   vctrs_0.6.1     
+    ## [21] grid_3.6.3       tidyselect_1.1.0 glue_1.4.2       R6_2.5.0         fansi_1.0.3     
+    ## [26] farver_2.0.3     purrr_0.3.4      magrittr_2.0.3   scales_1.1.1     ellipsis_0.3.2  
+    ## [31] htmltools_0.5.2  colorspace_2.0-3 labeling_0.4.2   utf8_1.1.4       stringi_1.4.6   
+    ## [36] munsell_0.5.0    crayon_1.3.4
 
 ``` r
 library(ggplot2); packageVersion("ggplot2") #3.3.2
@@ -35,17 +43,6 @@ library(ggplot2); packageVersion("ggplot2") #3.3.2
 ``` r
 library(dplyr); packageVersion("dplyr") #1.0.2
 ```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
 
     ## [1] '1.0.2'
 
@@ -101,8 +98,8 @@ all_Ts_smrz <-
   summarise(Abundance_m=mean(Abundance, na.rm=TRUE)) #mean raw density
 ```
 
-    ## `summarise()` regrouping output by 'Treatment', 'Recipient' (override with
-    ## `.groups` argument)
+    ## `summarise()` regrouping output by 'Treatment', 'Recipient' (override with `.groups`
+    ## argument)
 
 ``` r
 ## Show data sheet
@@ -149,14 +146,14 @@ head(Abundance_TrEff)
 ```
 
     ## # A tibble: 6 x 5
-    ##   Recipient Year  Treatment_Cont Abundance_response_nR~ abs_Abundance_response_~
-    ##   <fct>     <chr> <fct>                           <dbl>                    <dbl>
-    ## 1 Phytopla1 2017  Fipro_Cont                     0.162                    0.162 
-    ## 2 Phytopla1 2018  Fipro_Cont                     0.0631                   0.0631
-    ## 3 Phytopla1 2019  Fipro_Cont                     2.72                     2.72  
-    ## 4 Roti1     2017  Fipro_Cont                     0.320                    0.320 
-    ## 5 Roti1     2018  Fipro_Cont                    -0.547                    0.547 
-    ## 6 Roti1     2019  Fipro_Cont                    -0.631                    0.631
+    ##   Recipient Year  Treatment_Cont Abundance_response_nRR_0.1 abs_Abundance_response_nRR_0.1
+    ##   <fct>     <chr> <fct>                               <dbl>                          <dbl>
+    ## 1 Phytopla1 2017  Fipro_Cont                         0.162                          0.162 
+    ## 2 Phytopla1 2018  Fipro_Cont                         0.0631                         0.0631
+    ## 3 Phytopla1 2019  Fipro_Cont                         2.72                           2.72  
+    ## 4 Roti1     2017  Fipro_Cont                         0.320                          0.320 
+    ## 5 Roti1     2018  Fipro_Cont                        -0.547                          0.547 
+    ## 6 Roti1     2019  Fipro_Cont                        -0.631                          0.631
 
 ``` r
 # Visualize sensitivity
@@ -168,8 +165,7 @@ smrz_Abundance_TrEff <-
   ungroup(.)
 ```
 
-    ## `summarise()` regrouping output by 'Recipient' (override with `.groups`
-    ## argument)
+    ## `summarise()` regrouping output by 'Recipient' (override with `.groups` argument)
 
 ``` r
 ## Split by treatments
@@ -189,12 +185,18 @@ reaction.norm <-
   smrz_Abundance_TrEff %>%
   #  mutate(Treatment_Cont=factor(Treatment_Cont, levels=c("Fipro_Cont", "Joint_Cont", "Pent_Cont"))) %>%
   ggplot(aes(x=Recipient, y=log(abs_Abundance_response_nRR_0.1+1))) +
-  geom_point(aes(group=Treatment_Cont, color=Treatment_Cont), size=4, shape=16) +
+  geom_point(aes(group=Treatment_Cont, color=Treatment_Cont, shape=Treatment_Cont), size=4) +
   geom_line(aes(group=Treatment_Cont, color=Treatment_Cont)) +
-  geom_point(Abundance_TrEff, mapping=aes(x=Recipient, y=log(abs_Abundance_response_nRR_0.1+1), group=Treatment_Cont, color=Treatment_Cont), alpha=0.4, shape=16) +
+  geom_point(Abundance_TrEff, 
+             mapping=aes(x=Recipient, y=log(abs_Abundance_response_nRR_0.1+1), 
+                         group=Treatment_Cont, 
+                         color=Treatment_Cont, 
+                         shape=Treatment_Cont), 
+             alpha=0.4, size=2.5) +
   scale_color_manual(values=palSet1[c(1, 2, 3)], labels=c("I vs. C", "H vs. C", "I+H vs. C")) + 
+  scale_shape_manual(values=c(16, 17, 15), labels=c("I vs. C", "H vs. C", "I+H vs. C")) + 
   scale_x_discrete(name="Community member", labels=c("Phyt", "Roti", "C.zoop", "Macr", "Detr", "Herb", "P.pred", "B.pred", "N.pred", "Moll")) + 
-  guides(color=guide_legend(title=NULL)) +
+  guides(color=guide_legend(title=NULL), shape=guide_legend(title=NULL)) +
   ylab("ln(Population sensitivity + 1)") + 
   theme_custom()
 

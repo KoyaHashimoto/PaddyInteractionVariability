@@ -110,12 +110,18 @@ reaction.norm <-
   smrz_Abundance_TrEff %>%
   #  mutate(Treatment_Cont=factor(Treatment_Cont, levels=c("Fipro_Cont", "Joint_Cont", "Pent_Cont"))) %>%
   ggplot(aes(x=Recipient, y=log(abs_Abundance_response_nRR_0.1+1))) +
-  geom_point(aes(group=Treatment_Cont, color=Treatment_Cont), size=4, shape=16) +
+  geom_point(aes(group=Treatment_Cont, color=Treatment_Cont, shape=Treatment_Cont), size=4) +
   geom_line(aes(group=Treatment_Cont, color=Treatment_Cont)) +
-  geom_point(Abundance_TrEff, mapping=aes(x=Recipient, y=log(abs_Abundance_response_nRR_0.1+1), group=Treatment_Cont, color=Treatment_Cont), alpha=0.4, shape=16) +
+  geom_point(Abundance_TrEff, 
+             mapping=aes(x=Recipient, y=log(abs_Abundance_response_nRR_0.1+1), 
+                         group=Treatment_Cont, 
+                         color=Treatment_Cont, 
+                         shape=Treatment_Cont), 
+             alpha=0.4, size=2.5) +
   scale_color_manual(values=palSet1[c(1, 2, 3)], labels=c("I vs. C", "H vs. C", "I+H vs. C")) + 
+  scale_shape_manual(values=c(16, 17, 15), labels=c("I vs. C", "H vs. C", "I+H vs. C")) + 
   scale_x_discrete(name="Community member", labels=c("Phyt", "Roti", "C.zoop", "Macr", "Detr", "Herb", "P.pred", "B.pred", "N.pred", "Moll")) + 
-  guides(color=guide_legend(title=NULL)) +
+  guides(color=guide_legend(title=NULL), shape=guide_legend(title=NULL)) +
   ylab("ln(Population sensitivity + 1)") + 
   theme_custom()
 
