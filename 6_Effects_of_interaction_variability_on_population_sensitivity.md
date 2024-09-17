@@ -21,32 +21,34 @@ sessionInfo() #save session information
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] afex_0.28-0        emmeans_1.5.2-1    car_3.0-10         carData_3.0-4     
-    ##  [5] lme4_1.1-25        Matrix_1.2-18      ggeffects_1.2.0    visreg_2.7.0      
-    ##  [9] glmmTMB_1.0.2.1    igraph_1.2.6       rmarkdown_2.5      patchwork_1.1.1   
-    ## [13] ggsci_2.9          ggplot2_3.3.2      RColorBrewer_1.1-2 tidyr_1.1.2       
-    ## [17] dplyr_1.0.2       
+    ##  [1] rmarkdown_2.5      afex_0.28-0        emmeans_1.5.2-1    car_3.0-10        
+    ##  [5] carData_3.0-4      lme4_1.1-25        Matrix_1.2-18      ggeffects_1.2.0   
+    ##  [9] visreg_2.7.0       glmmTMB_1.0.2.1    igraph_1.2.6       ggsci_2.9         
+    ## [13] RColorBrewer_1.1-2 patchwork_1.1.1    tidyr_1.1.2        dplyr_1.0.2       
+    ## [17] ggplot2_3.3.2     
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] splines_3.6.3       statmod_1.4.35      cellranger_1.1.0    yaml_2.2.1         
-    ##  [5] numDeriv_2016.8-1.1 pillar_1.4.6        lattice_0.20-38     glue_1.4.2         
-    ##  [9] digest_0.6.27       minqa_1.2.4         colorspace_2.0-3    sandwich_3.0-0     
-    ## [13] plyr_1.8.6          htmltools_0.5.2     pkgconfig_2.0.3     haven_2.3.1        
-    ## [17] purrr_0.3.4         xtable_1.8-4        mvtnorm_1.1-1       scales_1.1.1       
-    ## [21] openxlsx_4.2.3      rio_0.5.16          tibble_3.0.4        generics_0.1.0     
-    ## [25] farver_2.0.3        ellipsis_0.3.2      TH.data_1.0-10      withr_2.5.0        
-    ## [29] TMB_1.7.18          cli_3.4.1           survival_3.1-8      magrittr_2.0.3     
-    ## [33] crayon_1.3.4        readxl_1.3.1        estimability_1.3    evaluate_0.14      
-    ## [37] fansi_1.0.3         nlme_3.1-150        MASS_7.3-53         forcats_0.5.0      
-    ## [41] foreign_0.8-75      tools_3.6.3         data.table_1.13.2   hms_0.5.3          
-    ## [45] lifecycle_1.0.3     multcomp_1.4-14     stringr_1.4.0       munsell_0.5.0      
-    ## [49] zip_2.1.1           compiler_3.6.3      rlang_1.1.0         grid_3.6.3         
-    ## [53] nloptr_1.2.2.2      rstudioapi_0.11     labeling_0.4.2      boot_1.3-24        
-    ## [57] lmerTest_3.1-3      gtable_0.3.0        codetools_0.2-16    abind_1.4-5        
-    ## [61] curl_4.3            reshape2_1.4.4      R6_2.5.0            zoo_1.8-8          
-    ## [65] knitr_1.30          fastmap_1.1.0       utf8_1.1.4          stringi_1.4.6      
-    ## [69] parallel_3.6.3      Rcpp_1.0.11         vctrs_0.6.1         tidyselect_1.1.0   
-    ## [73] xfun_0.19           coda_0.19-4
+    ##  [1] nlme_3.1-150        rprojroot_1.3-2     numDeriv_2016.8-1.1 tools_3.6.3        
+    ##  [5] TMB_1.7.18          backports_1.2.0     utf8_1.1.4          R6_2.5.0           
+    ##  [9] mgcv_1.8-33         colorspace_2.0-3    withr_2.5.0         tidyselect_1.1.0   
+    ## [13] curl_4.3            compiler_3.6.3      cli_3.4.1           desc_1.2.0         
+    ## [17] sandwich_3.0-0      labeling_0.4.2      scales_1.1.1        mvtnorm_1.1-1      
+    ## [21] stringr_1.4.0       digest_0.6.27       foreign_0.8-75      minqa_1.2.4        
+    ## [25] rio_0.5.16          pkgconfig_2.0.3     htmltools_0.5.2     fastmap_1.1.0      
+    ## [29] rlang_1.1.0         readxl_1.3.1        rstudioapi_0.11     gridGraphics_0.5-1 
+    ## [33] farver_2.0.3        generics_0.1.0      zoo_1.8-8           zip_2.1.1          
+    ## [37] magrittr_2.0.3      Rcpp_1.0.11         munsell_0.5.0       fansi_1.0.3        
+    ## [41] abind_1.4-5         lifecycle_1.0.3     stringi_1.4.6       multcomp_1.4-14    
+    ## [45] yaml_2.2.1          MASS_7.3-53         plyr_1.8.6          grid_3.6.3         
+    ## [49] parallel_3.6.3      forcats_0.5.0       crayon_1.3.4        lattice_0.20-38    
+    ## [53] haven_2.3.1         splines_3.6.3       hms_0.5.3           knitr_1.30         
+    ## [57] pillar_1.4.6        boot_1.3-24         estimability_1.3    reshape2_1.4.4     
+    ## [61] codetools_0.2-16    pkgload_1.1.0       glue_1.4.2          evaluate_0.14      
+    ## [65] data.table_1.13.2   vctrs_0.6.1         nloptr_1.2.2.2      testthat_3.0.0     
+    ## [69] cellranger_1.1.0    gtable_0.3.0        purrr_0.3.4         assertthat_0.2.1   
+    ## [73] xfun_0.19           openxlsx_4.2.3      xtable_1.8-4        coda_0.19-4        
+    ## [77] survival_3.1-8      tibble_3.0.4        lmerTest_3.1-3      statmod_1.4.35     
+    ## [81] TH.data_1.0-10      ellipsis_0.3.2
 
 ``` r
 library(ggplot2); packageVersion("ggplot2") #3.3.2
@@ -665,7 +667,7 @@ p4<- plot(visreg(Vulnerability.Ta_JC.TMB, "Function", re.form=NA, plot=FALSE), b
 ``` r
 theme_set(theme_test())
 fig5 <- (fig.fipro / fig.pent / fig.joint) + plot_annotation(tag_levels="a") & 
-  theme(plot.tag.position=c(0.06, 0.95), plot.tag=element_text(face="bold"), plot.margin=unit(c(8, 1.5, 5.5, 8), "pt"))
+  theme(plot.tag.position=c(0.06, 0.95), plot.tag=element_text(face="bold"), plot.margin=unit(c(8, 1.5, 5.5, 8), "pt"), text=element_text(size=13))
 #windows(14, 9.5, rescale="fixed")
 fig5
 ```

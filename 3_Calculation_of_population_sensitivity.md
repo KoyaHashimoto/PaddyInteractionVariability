@@ -21,18 +21,34 @@ sessionInfo() #save session information (R version 3.6.3 (2020))
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] rmarkdown_2.5      ggsci_2.9          patchwork_1.1.1    tidyr_1.1.2       
-    ## [5] dplyr_1.0.2        ggplot2_3.3.2      RColorBrewer_1.1-2
+    ##  [1] rmarkdown_2.5      afex_0.28-0        emmeans_1.5.2-1    car_3.0-10        
+    ##  [5] carData_3.0-4      lme4_1.1-25        Matrix_1.2-18      ggeffects_1.2.0   
+    ##  [9] visreg_2.7.0       glmmTMB_1.0.2.1    igraph_1.2.6       ggsci_2.9         
+    ## [13] RColorBrewer_1.1-2 patchwork_1.1.1    tidyr_1.1.2        dplyr_1.0.2       
+    ## [17] ggplot2_3.3.2     
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] pillar_1.4.6     compiler_3.6.3   tools_3.6.3      digest_0.6.27    evaluate_0.14   
-    ##  [6] lifecycle_1.0.3  tibble_3.0.4     gtable_0.3.0     pkgconfig_2.0.3  rlang_1.1.0     
-    ## [11] cli_3.4.1        rstudioapi_0.11  yaml_2.2.1       xfun_0.19        fastmap_1.1.0   
-    ## [16] stringr_1.4.0    withr_2.5.0      knitr_1.30       generics_0.1.0   vctrs_0.6.1     
-    ## [21] grid_3.6.3       tidyselect_1.1.0 glue_1.4.2       R6_2.5.0         fansi_1.0.3     
-    ## [26] farver_2.0.3     purrr_0.3.4      magrittr_2.0.3   scales_1.1.1     ellipsis_0.3.2  
-    ## [31] htmltools_0.5.2  colorspace_2.0-3 labeling_0.4.2   utf8_1.1.4       stringi_1.4.6   
-    ## [36] munsell_0.5.0    crayon_1.3.4
+    ##  [1] nlme_3.1-150        rprojroot_1.3-2     numDeriv_2016.8-1.1 tools_3.6.3        
+    ##  [5] TMB_1.7.18          backports_1.2.0     utf8_1.1.4          R6_2.5.0           
+    ##  [9] mgcv_1.8-33         colorspace_2.0-3    withr_2.5.0         tidyselect_1.1.0   
+    ## [13] curl_4.3            compiler_3.6.3      cli_3.4.1           desc_1.2.0         
+    ## [17] sandwich_3.0-0      labeling_0.4.2      scales_1.1.1        mvtnorm_1.1-1      
+    ## [21] stringr_1.4.0       digest_0.6.27       foreign_0.8-75      minqa_1.2.4        
+    ## [25] rio_0.5.16          pkgconfig_2.0.3     htmltools_0.5.2     fastmap_1.1.0      
+    ## [29] rlang_1.1.0         readxl_1.3.1        rstudioapi_0.11     gridGraphics_0.5-1 
+    ## [33] farver_2.0.3        generics_0.1.0      zoo_1.8-8           zip_2.1.1          
+    ## [37] magrittr_2.0.3      Rcpp_1.0.11         munsell_0.5.0       fansi_1.0.3        
+    ## [41] abind_1.4-5         lifecycle_1.0.3     stringi_1.4.6       multcomp_1.4-14    
+    ## [45] yaml_2.2.1          MASS_7.3-53         plyr_1.8.6          grid_3.6.3         
+    ## [49] parallel_3.6.3      forcats_0.5.0       crayon_1.3.4        lattice_0.20-38    
+    ## [53] haven_2.3.1         splines_3.6.3       hms_0.5.3           knitr_1.30         
+    ## [57] pillar_1.4.6        boot_1.3-24         estimability_1.3    reshape2_1.4.4     
+    ## [61] codetools_0.2-16    pkgload_1.1.0       glue_1.4.2          evaluate_0.14      
+    ## [65] data.table_1.13.2   vctrs_0.6.1         nloptr_1.2.2.2      testthat_3.0.0     
+    ## [69] cellranger_1.1.0    gtable_0.3.0        purrr_0.3.4         assertthat_0.2.1   
+    ## [73] xfun_0.19           openxlsx_4.2.3      xtable_1.8-4        coda_0.19-4        
+    ## [77] survival_3.1-8      tibble_3.0.4        lmerTest_3.1-3      statmod_1.4.35     
+    ## [81] TH.data_1.0-10      ellipsis_0.3.2
 
 ``` r
 library(ggplot2); packageVersion("ggplot2") #3.3.2
@@ -172,9 +188,7 @@ smrz_Abundance_TrEff <-
 
 theme_custom <- function() {
   theme_bw() + 
-    theme(axis.text=element_text(colour="black"), 
-          axis.ticks=element_line(colour="black"),
-          panel.border=element_rect(fill=NA, 
+    theme(panel.border=element_rect(fill=NA, 
                                     colour="black"), 
           panel.spacing=unit(3, "pt"),
           strip.text=element_text(colour="black", lineheight=0.7))
@@ -266,7 +280,8 @@ density.boxplot_gg <-
 
 ``` r
 #windows(8, 7, rescale="fixed")
-density.boxplot_gg / reaction.norm + plot_layout(height=c(5, 3)) + plot_annotation(tag_levels="a") & theme(plot.tag=element_text(face="bold"))
+density.boxplot_gg / reaction.norm + plot_layout(height=c(5, 3)) + plot_annotation(tag_levels="a") & 
+  theme(plot.tag=element_text(face="bold"), text=element_text(size=14))
 ```
 
 ![](3_Calculation_of_population_sensitivity_files/figure-markdown_github/paper%20fig-1.png)

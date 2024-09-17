@@ -20,11 +20,35 @@ sessionInfo() #save session information (R version 3.6.3 (2020))
     ## attached base packages:
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
+    ## other attached packages:
+    ##  [1] rmarkdown_2.5      afex_0.28-0        emmeans_1.5.2-1    car_3.0-10        
+    ##  [5] carData_3.0-4      lme4_1.1-25        Matrix_1.2-18      ggeffects_1.2.0   
+    ##  [9] visreg_2.7.0       glmmTMB_1.0.2.1    igraph_1.2.6       ggsci_2.9         
+    ## [13] RColorBrewer_1.1-2 patchwork_1.1.1    tidyr_1.1.2        dplyr_1.0.2       
+    ## [17] ggplot2_3.3.2     
+    ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] compiler_3.6.3  magrittr_2.0.3  fastmap_1.1.0   cli_3.4.1      
-    ##  [5] tools_3.6.3     htmltools_0.5.2 rstudioapi_0.11 yaml_2.2.1     
-    ##  [9] stringi_1.4.6   rmarkdown_2.5   knitr_1.30      stringr_1.4.0  
-    ## [13] xfun_0.19       digest_0.6.27   rlang_1.1.0     evaluate_0.14
+    ##  [1] nlme_3.1-150        rprojroot_1.3-2     numDeriv_2016.8-1.1 tools_3.6.3        
+    ##  [5] TMB_1.7.18          backports_1.2.0     utf8_1.1.4          R6_2.5.0           
+    ##  [9] mgcv_1.8-33         colorspace_2.0-3    withr_2.5.0         tidyselect_1.1.0   
+    ## [13] curl_4.3            compiler_3.6.3      cli_3.4.1           desc_1.2.0         
+    ## [17] sandwich_3.0-0      labeling_0.4.2      scales_1.1.1        mvtnorm_1.1-1      
+    ## [21] stringr_1.4.0       digest_0.6.27       foreign_0.8-75      minqa_1.2.4        
+    ## [25] rio_0.5.16          pkgconfig_2.0.3     htmltools_0.5.2     fastmap_1.1.0      
+    ## [29] rlang_1.1.0         readxl_1.3.1        rstudioapi_0.11     gridGraphics_0.5-1 
+    ## [33] farver_2.0.3        generics_0.1.0      zoo_1.8-8           zip_2.1.1          
+    ## [37] magrittr_2.0.3      Rcpp_1.0.11         munsell_0.5.0       fansi_1.0.3        
+    ## [41] abind_1.4-5         lifecycle_1.0.3     stringi_1.4.6       multcomp_1.4-14    
+    ## [45] yaml_2.2.1          MASS_7.3-53         plyr_1.8.6          grid_3.6.3         
+    ## [49] parallel_3.6.3      forcats_0.5.0       crayon_1.3.4        lattice_0.20-38    
+    ## [53] haven_2.3.1         splines_3.6.3       hms_0.5.3           knitr_1.30         
+    ## [57] pillar_1.4.6        boot_1.3-24         estimability_1.3    reshape2_1.4.4     
+    ## [61] codetools_0.2-16    pkgload_1.1.0       glue_1.4.2          evaluate_0.14      
+    ## [65] data.table_1.13.2   vctrs_0.6.1         nloptr_1.2.2.2      testthat_3.0.0     
+    ## [69] cellranger_1.1.0    gtable_0.3.0        purrr_0.3.4         assertthat_0.2.1   
+    ## [73] xfun_0.19           openxlsx_4.2.3      xtable_1.8-4        coda_0.19-4        
+    ## [77] survival_3.1-8      tibble_3.0.4        lmerTest_3.1-3      statmod_1.4.35     
+    ## [81] TH.data_1.0-10      ellipsis_0.3.2
 
 ``` r
 library(ggplot2); packageVersion("ggplot2") #3.3.2
@@ -35,17 +59,6 @@ library(ggplot2); packageVersion("ggplot2") #3.3.2
 ``` r
 library(dplyr); packageVersion("dplyr") #1.0.2
 ```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
 
     ## [1] '1.0.2'
 
@@ -64,25 +77,6 @@ library(patchwork); packageVersion("patchwork") #1.1.1
 ``` r
 library(igraph); packageVersion("igraph") #1.2.6
 ```
-
-    ## 
-    ## Attaching package: 'igraph'
-
-    ## The following object is masked from 'package:tidyr':
-    ## 
-    ##     crossing
-
-    ## The following objects are masked from 'package:dplyr':
-    ## 
-    ##     as_data_frame, groups, union
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     decompose, spectrum
-
-    ## The following object is masked from 'package:base':
-    ## 
-    ##     union
 
     ## [1] '1.2.6'
 
@@ -192,8 +186,8 @@ all_multsmap_coefs_Osmrz <-  #averaging over years and tanks
             smap_coef_SD=mean(smap_coef_SD, na.rm=TRUE))
 ```
 
-    ## `summarise()` regrouping output by 'Treatment', 'Recipient', 'Donor',
-    ## 'r_d' (override with `.groups` argument)
+    ## `summarise()` regrouping output by 'Treatment', 'Recipient', 'Donor', 'r_d' (override with
+    ## `.groups` argument)
 
 ``` r
 all_multsmap_coefs_YTsmrz_intersp <- #extract interspecific effects
@@ -203,8 +197,8 @@ all_multsmap_coefs_YTsmrz_intersp <- #extract interspecific effects
   select(-Donor_, - delay)
 ```
 
-    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 984 rows [1, 2,
-    ## 3, 4, 5, 6, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, ...].
+    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 984 rows [1, 2, 3, 4, 5, 6,
+    ## 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, ...].
 
 ``` r
 all_multsmap_coefs_Osmrz_intersp <- #extract interspecific effects
@@ -214,8 +208,8 @@ all_multsmap_coefs_Osmrz_intersp <- #extract interspecific effects
   select(-Donor_, - delay)
 ```
 
-    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 164 rows [1, 3,
-    ## 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 20, 21, 22, 24, 25, 26, 27, 28, ...].
+    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 164 rows [1, 3, 4, 5, 6, 7,
+    ## 8, 11, 12, 13, 14, 15, 20, 21, 22, 24, 25, 26, 27, 28, ...].
 
 ``` r
 all_multsmap_coefs_Osmrz_intersp_abs <- #add absolute values of s-map coefs and their signs
@@ -234,7 +228,7 @@ histogram.cont.fig <- #extract and process control data
   filter(all_multsmap_coefs_Osmrz_intersp_abs, Treatment=="Cont") %>%
   ggplot(.) +
   geom_histogram(position="stack", binwidth=0.05, boundary=0, closed="left", color="black", mapping=aes(x=abs_smap_coef, fill=Sign)) +
-  scale_x_continuous(name="Mean interaction strength (abs. mean S-map coefs of the controls)") + 
+  scale_x_continuous(name="Mean interaction strength\n(abs. mean S-map coefs of the controls)") + 
   scale_y_continuous(breaks=seq(0, 10, 2), name="Count") + 
   geom_text(data=f_labels[1,], aes(label=label, x=x, y=y), size=10) + 
   scale_fill_brewer(palette="Set1") +
@@ -288,8 +282,8 @@ plot(g1, layout=l, vertex.label.family="sans", vertex.color=8, vertex.size=10,
                                      breaks=seq(0, 8, 0.5), 
                                      right=TRUE)], 
      edge.arrow.size=1.5, 
-     vertex.label.dist=c(1.5, 2.2, 2.6, 1.5, 2.2, 1.5, 2.2, 2.2, 2.2, 1.5), 
-     vertex.label.degree=c(pi/2, -pi/4, -9*pi/20, -pi/2, -3*pi/4, pi/2, pi/2, pi/2, pi/2, pi/2))
+     vertex.label.dist=c(1.5, 2.2, 3.1, 1.5, 2.2, 1.5, 2.2, 2.2, 2.2, 1.5), 
+     vertex.label.degree=c(pi/2, -pi/4, -7*pi/20, -pi/2, -3*pi/4, pi/2, pi/2, pi/2, pi/2, pi/2))
 legend("topleft", legend="Cont", bty="n", x.intersp=0, y.intersp=0, cex=1.2)
 ```
 
@@ -369,8 +363,7 @@ IS.indices_ggplot2_mean <- #data processing
   filter(Treatment=="Cont")
 ```
 
-    ## `summarise()` regrouping output by 'Treatment', 'RD' (override with `.groups`
-    ## argument)
+    ## `summarise()` regrouping output by 'Treatment', 'RD' (override with `.groups` argument)
 
 ``` r
 tempvar <- #draw sd fig
@@ -453,9 +446,9 @@ panel1 <- function(x) {par(mar=c(3, 3, 3, 3), family="sans", cex=0.8, las=1)
                                        labels=seq(0.5, 8, 0.5), 
                                        breaks=seq(0, 8, 0.5), 
                                        right=TRUE)], 
-       edge.arrow.size=1.5, 
-       vertex.label.dist=c(1.5, 2.2, 2.6, 1.5, 2.2, 1.5, 2.2, 2.2, 2.2, 1.5), 
-       vertex.label.degree=c(pi/2, -pi/4, -9*pi/20, -pi/2, -3*pi/4, pi/2, pi/2, pi/2, pi/2, pi/2))
+       edge.arrow.size=1.2, 
+       vertex.label.dist=c(1.5, 2.2, 3.1, 1.5, 2.2, 1.5, 2.2, 2.2, 2.2, 1.5), 
+       vertex.label.degree=c(pi/2, -pi/4, -7*pi/20, -pi/2, -3*pi/4, pi/2, pi/2, pi/2, pi/2, pi/2))
 }
 
 
@@ -482,8 +475,8 @@ all_multsmap_coefs_intersp <-
   ungroup(.)
 ```
 
-    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 9800 rows [1, 2,
-    ## 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
+    ## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 9800 rows [1, 2, 3, 4, 5,
+    ## 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
 all_multsmap_coefs_intersp_ab <- left_join(mutate(all_multsmap_coefs_intersp, Year=as.character(Year)), all_Ts)
@@ -575,8 +568,9 @@ gg1_
 ``` r
 fig3.ggplot2_2 <- 
   fig3abc.ggplot2 - gg1_ + plot_layout(nrow=2) + 
-  plot_annotation(tag_levels='a') & theme(plot.tag=element_text(face="bold"))
+  plot_annotation(tag_levels='a') & theme(plot.tag=element_text(face="bold"), text=element_text(size=14))
 
+#windows(rescale="fixed", width=14, height=12)
 plot(fig3.ggplot2_2)
 ```
 

@@ -97,9 +97,7 @@ smrz_Abundance_TrEff <-
 
 theme_custom <- function() {
   theme_bw() + 
-    theme(axis.text=element_text(colour="black"), 
-          axis.ticks=element_line(colour="black"),
-          panel.border=element_rect(fill=NA, 
+    theme(panel.border=element_rect(fill=NA, 
                                     colour="black"), 
           panel.spacing=unit(3, "pt"),
           strip.text=element_text(colour="black", lineheight=0.7))
@@ -187,6 +185,7 @@ density.boxplot_gg <-
 
 ```{r paper fig, fig.width=8, fig.height=7}
 #windows(8, 7, rescale="fixed")
-density.boxplot_gg / reaction.norm + plot_layout(height=c(5, 3)) + plot_annotation(tag_levels="a") & theme(plot.tag=element_text(face="bold"))
+density.boxplot_gg / reaction.norm + plot_layout(height=c(5, 3)) + plot_annotation(tag_levels="a") & 
+  theme(plot.tag=element_text(face="bold"), text=element_text(size=14))
 ggsave("./figs/fig2.ggplot2.pdf", width=8, height=7, device=cairo_pdf, unit="in")
 ```

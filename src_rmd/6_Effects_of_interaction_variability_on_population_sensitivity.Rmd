@@ -253,7 +253,7 @@ p4<- plot(visreg(Vulnerability.Ta_JC.TMB, "Function", re.form=NA, plot=FALSE), b
 ```{r fig assemble, fig.width=14, fig.height=9.5}
 theme_set(theme_test())
 fig5 <- (fig.fipro / fig.pent / fig.joint) + plot_annotation(tag_levels="a") & 
-  theme(plot.tag.position=c(0.06, 0.95), plot.tag=element_text(face="bold"), plot.margin=unit(c(8, 1.5, 5.5, 8), "pt"))
+  theme(plot.tag.position=c(0.06, 0.95), plot.tag=element_text(face="bold"), plot.margin=unit(c(8, 1.5, 5.5, 8), "pt"), text=element_text(size=13))
 #windows(14, 9.5, rescale="fixed")
 fig5
 ggsave("./figs/fig4.ggplot2.pdf", width=14, height=9, device=cairo_pdf, unit="in")
